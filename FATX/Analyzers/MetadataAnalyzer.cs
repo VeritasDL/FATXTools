@@ -293,10 +293,11 @@ namespace FATX.Analyzers
 
             // NOTE: deleted files have been found with firstCluster set to 0
             //  To be as thorough as we can, let's include those.
-            //if (firstCluster == 0)
-            //{
-            //    return false;
-            //}
+            // (reverted to work around an issue)
+            if (firstCluster == 0)
+            {
+                return false;
+            }
 
             return true;
         }
