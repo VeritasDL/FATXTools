@@ -22,7 +22,7 @@ namespace FATXTools.Dialogs
             String lastAccessTimeString = "";
 
             try {
-                String creationTimeString = "invalid";
+                creationTimeString = "invalid";
                 DateTime creationTime = new DateTime(dirent.CreationTime.Year,
                     dirent.CreationTime.Month, dirent.CreationTime.Day,
                     dirent.CreationTime.Hour, dirent.CreationTime.Minute,
