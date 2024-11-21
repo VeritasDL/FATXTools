@@ -314,12 +314,7 @@ namespace FATX.Analyzers
                 return false;
             }
 
-            if (fileNameLength > 42)
-            {
-                return false;
-            }
-
-            if (fileNameLength > 0x2a && fileNameLength != 0xe5)
+            if (fileNameLength > 42 && fileNameLength != 0xe5)
             {
                 return false;
             }
