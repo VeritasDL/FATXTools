@@ -251,6 +251,11 @@ namespace FATX.Analyzers
                 return false;
             }
 
+            if (dateTime.Year > 2038 || dateTime.Year < 1981)
+            {
+                return false;
+            }
+
             if (dateTime.Month > 12 || dateTime.Month < 1)
             {
                 return false;
