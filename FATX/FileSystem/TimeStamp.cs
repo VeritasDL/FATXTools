@@ -90,6 +90,9 @@ namespace FATX.FileSystem
                 }
                 catch (Exception)
                 {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                    Console.WriteLine("invalid date "+this.Year+"/"+this.Month+"/"+this.Day+" "+this.Hour+":"+this.Minute+"."+this.Second);
                     int year = (int)((this._Time & 0xffff) & 0x7f) + 2000;
                     int month = (int)((this._Time & 0xffff) >> 7) & 0xf;
                     int day = (int)((this._Time & 0xffff) >> 0xb);
@@ -103,6 +106,10 @@ namespace FATX.FileSystem
                     }
                     catch (Exception)
                     {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                        Console.WriteLine("invalid date "+year+"/"+month+"/"+day+" "+hour+":"+minute+"."+second);
+                        Console.WriteLine("falling back to 1601/01/01");
                         _DateTime = _minWinFileTime;
                     }
 
