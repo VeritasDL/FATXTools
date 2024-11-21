@@ -17,22 +17,41 @@ namespace FATXTools.Dialogs
                 volume.ClusterToPhysicalOffset(dirent.FirstCluster).ToString("x"));
             listView1.Items.Add("Attributes").SubItems.Add(FormatAttributes(dirent.FileAttributes));
 
-            DateTime creationTime = new DateTime(dirent.CreationTime.Year,
-                dirent.CreationTime.Month, dirent.CreationTime.Day,
-                dirent.CreationTime.Hour, dirent.CreationTime.Minute,
-                dirent.CreationTime.Second);
-            DateTime lastWriteTime = new DateTime(dirent.LastWriteTime.Year,
-                dirent.LastWriteTime.Month, dirent.LastWriteTime.Day,
-                dirent.LastWriteTime.Hour, dirent.LastWriteTime.Minute,
-                dirent.LastWriteTime.Second);
-            DateTime lastAccessTime = new DateTime(dirent.LastAccessTime.Year,
-                dirent.LastAccessTime.Month, dirent.LastAccessTime.Day,
-                dirent.LastAccessTime.Hour, dirent.LastAccessTime.Minute,
-                dirent.LastAccessTime.Second);
+            String creationTimeString = "";
+            String lastWriteTimeString = "";
+            String lastAccessTimeString = "";
 
-            listView1.Items.Add("Creation Time").SubItems.Add(creationTime.ToString());
-            listView1.Items.Add("Last Write Time").SubItems.Add(lastWriteTime.ToString());
-            listView1.Items.Add("Last Access Time").SubItems.Add(lastAccessTime.ToString());
+            try {
+                String creationTimeString = "invalid";
+                DateTime creationTime = new DateTime(dirent.CreationTime.Year,
+                    dirent.CreationTime.Month, dirent.CreationTime.Day,
+                    dirent.CreationTime.Hour, dirent.CreationTime.Minute,
+                    dirent.CreationTime.Second);
+                creationTimeString = creationTime.ToString();
+
+                lastWriteTimeString = "invalid";
+                DateTime lastWriteTime = new DateTime(dirent.LastWriteTime.Year,
+                    dirent.LastWriteTime.Month, dirent.LastWriteTime.Day,
+                    dirent.LastWriteTime.Hour, dirent.LastWriteTime.Minute,
+                    dirent.LastWriteTime.Second);
+                lastWriteTimeString = creationTime.ToString();
+
+                lastAccessTimeString = "invalid";
+                DateTime lastAccessTime = new DateTime(dirent.LastAccessTime.Year,
+                    dirent.LastAccessTime.Month, dirent.LastAccessTime.Day,
+                    dirent.LastAccessTime.Hour, dirent.LastAccessTime.Minute,
+                    dirent.LastAccessTime.Second);
+                lastAccessTimeString = lastAccessTime.ToString();
+			}
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+            }
+
+            listView1.Items.Add("Creation Time").SubItems.Add(creationTimeString);
+            listView1.Items.Add("Last Write Time").SubItems.Add(lastWriteTimeString);
+            listView1.Items.Add("Last Access Time").SubItems.Add(lastAccessTimeString);
         }
 
         private string FormatAttributes(FileAttribute attributes)
