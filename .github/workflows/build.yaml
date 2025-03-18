@@ -5,7 +5,7 @@ on:
     branches:
       - 'master'
       - 'pr/**'
-      - 'test/**'
+      - 'read-cluster-fix'
   pull_request:
     branches: [ master ]
   
