@@ -2,7 +2,10 @@ name: Build FATXTools
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - 'master'
+      - 'pr/**'
+      - 'test/**'
   pull_request:
     branches: [ master ]
   
