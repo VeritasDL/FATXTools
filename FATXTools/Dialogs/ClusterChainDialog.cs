@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using FATX.FileSystem;
 
 using FATXTools.Database;
+using System.ComponentModel;
 
 namespace FATXTools.Dialogs
 {
@@ -13,6 +14,7 @@ namespace FATXTools.Dialogs
         Volume _volume;
         DatabaseFile _file;
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<uint> NewClusterChain { get; set; }
 
         public ClusterChainDialog(Volume volume, DatabaseFile file)

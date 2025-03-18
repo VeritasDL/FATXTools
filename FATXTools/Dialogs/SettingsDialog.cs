@@ -2,17 +2,20 @@
 using System.Windows.Forms;
 
 using FATX.Analyzers;
+using System.ComponentModel;
 
 namespace FATXTools.Dialogs
 {
     public partial class SettingsDialog : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public FileCarverInterval FileCarverInterval
         {
             get;
             set;
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string LogFile
         {
             get;

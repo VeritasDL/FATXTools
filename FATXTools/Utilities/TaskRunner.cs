@@ -53,7 +53,7 @@ namespace FATXTools.Utilities
 
                 var cancellationToken = cancellationTokenSource.Token;
 
-                var dialog = new TaskDialog(owner, options, ref _task, cancellationTokenSource);
+                var dialog = new FATXTools.Dialogs.TaskDialog(owner, options, ref _task, cancellationTokenSource);
                 dialog.Show();
 
                 _task = Task.Run(() => action(cancellationToken, dialog.Progress), cancellationToken);

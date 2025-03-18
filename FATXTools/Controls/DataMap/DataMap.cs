@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace FATXTools.Controls
 {
@@ -10,10 +11,15 @@ namespace FATXTools.Controls
     {
         #region Properties
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        #region Properties
+
         public int CellSize { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<int, DataMapCell> Cells { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public long CellCount
         {
             get
@@ -28,8 +34,10 @@ namespace FATXTools.Controls
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int SelectedIndex { get; set; }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int Increment { get; set; } = 1;
 
         #endregion // Properties
@@ -417,3 +425,4 @@ namespace FATXTools.Controls
         #endregion
     }
 }
+#endregion

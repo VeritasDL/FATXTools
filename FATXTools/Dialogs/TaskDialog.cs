@@ -2,12 +2,15 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace FATXTools.Dialogs
 {
     public partial class TaskDialog : Form
     {
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Title { get; private set; }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IProgress<ValueTuple<int, string>> Progress { get; private set; }
 
         Task _task;
