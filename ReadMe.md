@@ -1,4 +1,4 @@
-<img align="left" width="80" height="80" src="FATXTools/appicon.ico">
+ <img align="left" width="80" height="80" src="FATXTools/appicon.ico">
 
 # FATXTools ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/aerosoul94/FATXTools/Build%20FATXTools?label=master) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/aerosoul94/FATXTools/Build%20FATXTools/fatx-refactor?label=fatx-refactor)
 FATXTools is a data recovery tool for FATX file systems. The goal of this project is to automate searching and recovering deleted files as well as provide tools for manual data recovery.
