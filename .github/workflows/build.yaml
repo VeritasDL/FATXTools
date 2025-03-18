@@ -5,7 +5,7 @@ on:
     branches:
       - 'master'
       - 'pr/**'
-      - 'test/**'
+      - 'fix'
   pull_request:
     branches: [ master ]
   
