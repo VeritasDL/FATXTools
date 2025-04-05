@@ -61,7 +61,6 @@ namespace FATXTools.Database
 
             JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
             {
-                ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true,
             };
 
