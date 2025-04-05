@@ -1,16 +1,38 @@
 ﻿using FATX.FileSystem;
 using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace FATXTools.Dialogs
 {
+
     public partial class FileInfoDialog : Form
     {
+       public string CleanFileName(string input)
+        {
+            // Reserved characters in Windows filenames
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            var builder = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (c >= 0x20 && c <= 0x7E && !invalidChars.Contains(c))
+                {
+                    builder.Append(c);
+                }
+            }
+
+            // Trim trailing dots and spaces (also invalid at end of filenames)
+            return builder.ToString().TrimEnd('.', ' ');
+        }
         public FileInfoDialog(Volume volume, DirectoryEntry dirent)
         {
             InitializeComponent();
-
-            listView1.Items.Add("Name").SubItems.Add(dirent.FileName);
+            string rawFileName = dirent.FileName;
+            string cleanedFileName = CleanFileName(rawFileName);
+            listView1.Items.Add("Name").SubItems.Add(cleanedFileName);
             listView1.Items.Add("Size in bytes").SubItems.Add(dirent.FileSize.ToString());
             listView1.Items.Add("First Cluster").SubItems.Add(dirent.FirstCluster.ToString());
             listView1.Items.Add("First Cluster Offset").SubItems.Add("0x" +

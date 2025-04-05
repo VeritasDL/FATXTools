@@ -7,6 +7,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -14,6 +16,23 @@ namespace FATXTools.Controls
 {
     public partial class FileExplorer : UserControl
     {
+        public static string CleanFileName(string input)
+        {
+            // Reserved characters in Windows filenames
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            var builder = new StringBuilder(input.Length);
+            foreach (char c in input)
+            {
+                if (c >= 0x20 && c <= 0x7E && !invalidChars.Contains(c))
+                {
+                    builder.Append(c);
+                }
+            }
+
+            // Trim trailing dots and spaces (also invalid at end of filenames)
+            return builder.ToString().TrimEnd('.', ' ');
+        }
         private Color deletedColor = Color.FromArgb(255, 200, 200);
 
         private PartitionView parent;
@@ -67,7 +86,9 @@ namespace FATXTools.Controls
             {
                 if (dirent.IsDirectory())
                 {
-                    TreeNode node = parentNode.Nodes.Add(dirent.FileName);
+                    string rawFileName = dirent.FileName;
+                    string cleanedFileName = CleanFileName(rawFileName);
+                    TreeNode node = parentNode.Nodes.Add(cleanedFileName);
 
                     node.Tag = new NodeTag(dirent, NodeType.Dirent);
 
@@ -112,8 +133,9 @@ namespace FATXTools.Controls
             {
                 ListViewItem item = new ListViewItem(index.ToString());
                 item.Tag = new NodeTag(dirent, NodeType.Dirent);
-
-                item.SubItems.Add(dirent.FileName);
+                string rawFileName = dirent.FileName;
+                string cleanedFileName = CleanFileName(rawFileName);
+                item.SubItems.Add(cleanedFileName);
 
                 DateTime creationTime = dirent.CreationTime.AsDateTime();
                 DateTime lastWriteTime = dirent.LastWriteTime.AsDateTime();
@@ -517,7 +539,9 @@ namespace FATXTools.Controls
 
             private void SaveFile(string path, DirectoryEntry dirent)
             {
-                path = path + "\\" + dirent.FileName;
+                string rawFileName = dirent.FileName;
+                string cleanedFileName = CleanFileName(rawFileName);
+                path = path + "\\" + cleanedFileName;
                 Console.WriteLine(path);
 
                 // Report where we are at

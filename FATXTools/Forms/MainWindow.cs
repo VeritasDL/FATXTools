@@ -5,17 +5,24 @@ using FATXTools.DiskTypes;
 using FATXTools.Utilities;
 using Microsoft.Win32.SafeHandles;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace FATXTools.Forms
 {
     public partial class MainWindow : Form
     {
         private DriveView driveView;
-
+        private List<string> fileHistory = new List<string>();
+        private const int MaxHistoryCount = 30;
+        private const string HistoryFilePath = "FATxToolHistory.txt";
         private const string ApplicationTitle = "FATX-Recover";
 
         public MainWindow()
@@ -23,13 +30,23 @@ namespace FATXTools.Forms
             InitializeComponent();
 
             this.Text = ApplicationTitle;
-
+            this.Name = "MainWindow";
             DisableDatabaseOptions();
 
             Console.SetOut(new LogWriter(this.textBox1));
             Console.WriteLine("--------------------------------");
             Console.WriteLine("FATX-Tools v0.3");
             Console.WriteLine("--------------------------------");
+            if (File.Exists("FATxToolHistory.txt"))
+            {
+                LoadFileHistory();
+            }
+            else
+            {
+                File.Create("FATxToolHistory.txt").Dispose();
+                LoadFileHistory();
+                UpdateFileHistoryMenu();
+            }
         }
 
         public class LogWriter : TextWriter
@@ -137,8 +154,8 @@ namespace FATXTools.Forms
             saveToolStripMenuItem.Enabled = true;
 
             addPartitionToolStripMenuItem.Enabled = true;
-            //searchForPartitionsToolStripMenuItem.Enabled = true;
-            //managePartitionsToolStripMenuItem.Enabled = true;
+            searchForPartitionsToolStripMenuItem.Enabled = true;
+            managePartitionsToolStripMenuItem.Enabled = true;
         }
 
         private void DisableDatabaseOptions()
@@ -147,14 +164,16 @@ namespace FATXTools.Forms
             saveToolStripMenuItem.Enabled = false;
 
             addPartitionToolStripMenuItem.Enabled = false;
-            //searchForPartitionsToolStripMenuItem.Enabled = false;
-            //managePartitionsToolStripMenuItem.Enabled = false;
+            searchForPartitionsToolStripMenuItem.Enabled = false;
+            managePartitionsToolStripMenuItem.Enabled = false;
         }
 
         private void EnableOpenOptions()
         {
             openImageToolStripMenuItem.Enabled = true;
             openDeviceToolStripMenuItem.Enabled = true;
+            searchForPartitionsToolStripMenuItem.Enabled = true;
+            managePartitionsToolStripMenuItem.Enabled = true;
         }
 
         private void DisableOpenOptions()
@@ -171,7 +190,7 @@ namespace FATXTools.Forms
 
             RawImage rawImage = new RawImage(path);
             driveView.AddDrive(fileName, rawImage);
-
+            AddToFileHistory(path);
             EnableDatabaseOptions();
         }
 
@@ -190,7 +209,7 @@ namespace FATXTools.Forms
             long sectorLength = WinApi.GetSectorSize(handle);
             PhysicalDisk drive = new PhysicalDisk(handle, length, sectorLength);
             driveView.AddDrive(device, drive);
-
+            AddToFileHistory(device);
             EnableDatabaseOptions();
         }
 
@@ -200,6 +219,7 @@ namespace FATXTools.Forms
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 OpenDiskImage(ofd.FileName);
+
             }
         }
 
@@ -282,16 +302,54 @@ namespace FATXTools.Forms
             }
         }
 
-        private void addPartitionToolStripMenuItem_Click(object sender, EventArgs e)
+        private void devKitHeadderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void retail1888ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void retail2125618ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        public void addPartitionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NewPartitionDialog partitionDialog = new NewPartitionDialog();
             var dialogResult = partitionDialog.ShowDialog();
+
             if (dialogResult == DialogResult.OK)
             {
-                driveView.AddPartition(new Volume(driveView.GetDrive(),
-                    partitionDialog.PartitionName,
-                    partitionDialog.PartitionOffset,
-                    partitionDialog.PartitionLength));
+                string arrayInput = partitionDialog.textBox4.Text;
+
+                if (!string.IsNullOrWhiteSpace(arrayInput))
+                {
+                    var lines = arrayInput.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (string line in lines)
+                    {
+                        var match = Regex.Match(line, @"\(\s*""(?<name>[^""]+)""\s*,\s*0x(?<offset>[0-9A-Fa-f]+)\s*,\s*0x(?<length>[0-9A-Fa-f]+)\s*\)");
+                        if (!match.Success)
+                            continue;
+
+                        string name = match.Groups["name"].Value;
+                        long offset = Convert.ToInt64(match.Groups["offset"].Value, 16);
+                        long length = Convert.ToInt64(match.Groups["length"].Value, 16);
+
+                        driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
+                    }
+                }
+                else
+                {
+                    driveView.AddPartition(new Volume(driveView.GetDrive(),
+                        partitionDialog.PartitionName,
+                        partitionDialog.PartitionOffset,
+                        partitionDialog.PartitionLength));
+                }
             }
         }
 
@@ -377,6 +435,62 @@ namespace FATXTools.Forms
 
             // TODO: handle closing dialogs
             e.Cancel = false;
+        }
+        private void openRecentFileStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem item)
+            {
+                string filePath = item.Text;
+                OpenDiskImage(filePath);
+            }
+        }
+        private void AddToFileHistory(string device)
+        {
+            if (fileHistory.Contains(device))
+                fileHistory.Remove(device);
+
+            fileHistory.Insert(0, device);
+
+            if (fileHistory.Count > MaxHistoryCount)
+                fileHistory.RemoveAt(fileHistory.Count - 1);
+
+            SaveFileHistory();
+            UpdateFileHistoryMenu();
+        }
+
+        private void LoadFileHistory()
+        {
+            if (File.Exists(HistoryFilePath))
+                fileHistory = File.ReadAllLines(HistoryFilePath).ToList();
+            else
+                File.Create(HistoryFilePath).Dispose();
+
+            UpdateFileHistoryMenu();
+        }
+
+        private void SaveFileHistory()
+        {
+            File.WriteAllLines(HistoryFilePath, fileHistory);
+        }
+
+        private void UpdateFileHistoryMenu()
+        {
+            historyToolStripMenuItem.DropDownItems.Clear();
+
+            if (fileHistory.Count == 0)
+            {
+                var emptyItem = new ToolStripMenuItem("No history found");
+                emptyItem.Enabled = false;
+                historyToolStripMenuItem.DropDownItems.Add(emptyItem);
+                return;
+            }
+
+            foreach (var file in fileHistory)
+            {
+                var item = new ToolStripMenuItem(file);
+                item.Click += openRecentFileStripMenuItem_Click;
+                historyToolStripMenuItem.DropDownItems.Add(item);
+            }
         }
     }
 }

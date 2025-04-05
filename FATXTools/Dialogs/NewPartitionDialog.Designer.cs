@@ -26,115 +26,155 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        public void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            label1 = new System.Windows.Forms.Label();
+            textBox1 = new System.Windows.Forms.TextBox();
+            label2 = new System.Windows.Forms.Label();
+            textBox2 = new System.Windows.Forms.TextBox();
+            label3 = new System.Windows.Forms.Label();
+            textBox3 = new System.Windows.Forms.TextBox();
+            button1 = new System.Windows.Forms.Button();
+            button2 = new System.Windows.Forms.Button();
+            textBox4 = new System.Windows.Forms.TextBox();
+            button3 = new System.Windows.Forms.Button();
+            label4 = new System.Windows.Forms.Label();
+            SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 44);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(78, 32);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Name";
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(8, 21);
+            label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(39, 15);
+            label1.TabIndex = 0;
+            label1.Text = "Name";
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(13, 79);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(487, 39);
-            this.textBox1.TabIndex = 1;
+            textBox1.Location = new System.Drawing.Point(7, 37);
+            textBox1.Margin = new System.Windows.Forms.Padding(2);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new System.Drawing.Size(264, 23);
+            textBox1.TabIndex = 1;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 148);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(79, 32);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Offset";
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(7, 69);
+            label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(39, 15);
+            label2.TabIndex = 2;
+            label2.Text = "Offset";
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(13, 186);
-            this.textBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(487, 39);
-            this.textBox2.TabIndex = 3;
+            textBox2.Location = new System.Drawing.Point(7, 87);
+            textBox2.Margin = new System.Windows.Forms.Padding(2);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new System.Drawing.Size(264, 23);
+            textBox2.TabIndex = 3;
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(14, 253);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(88, 32);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Length";
+            label3.AutoSize = true;
+            label3.Location = new System.Drawing.Point(8, 119);
+            label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            label3.Name = "label3";
+            label3.Size = new System.Drawing.Size(44, 15);
+            label3.TabIndex = 4;
+            label3.Text = "Length";
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(18, 291);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(482, 39);
-            this.textBox3.TabIndex = 5;
+            textBox3.Location = new System.Drawing.Point(10, 136);
+            textBox3.Margin = new System.Windows.Forms.Padding(2);
+            textBox3.Name = "textBox3";
+            textBox3.Size = new System.Drawing.Size(261, 23);
+            textBox3.TabIndex = 5;
             // 
             // button1
             // 
-            this.button1.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.button1.Location = new System.Drawing.Point(20, 360);
-            this.button1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(218, 72);
-            this.button1.TabIndex = 6;
-            this.button1.Text = "OK";
-            this.button1.UseVisualStyleBackColor = true;
+            button1.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button1.Location = new System.Drawing.Point(11, 169);
+            button1.Margin = new System.Windows.Forms.Padding(2);
+            button1.Name = "button1";
+            button1.Size = new System.Drawing.Size(117, 34);
+            button1.TabIndex = 6;
+            button1.Text = "OK";
+            button1.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(283, 360);
-            this.button2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(218, 72);
-            this.button2.TabIndex = 7;
-            this.button2.Text = "Cancel";
-            this.button2.UseVisualStyleBackColor = true;
+            button2.Location = new System.Drawing.Point(152, 169);
+            button2.Margin = new System.Windows.Forms.Padding(2);
+            button2.Name = "button2";
+            button2.Size = new System.Drawing.Size(117, 34);
+            button2.TabIndex = 7;
+            button2.Text = "Cancel";
+            button2.UseVisualStyleBackColor = true;
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new System.Drawing.Point(307, 37);
+            textBox4.Margin = new System.Windows.Forms.Padding(2);
+            textBox4.Multiline = true;
+            textBox4.Name = "textBox4";
+            textBox4.Size = new System.Drawing.Size(539, 122);
+            textBox4.TabIndex = 8;
+            // 
+            // button3
+            // 
+            button3.DialogResult = System.Windows.Forms.DialogResult.OK;
+            button3.Location = new System.Drawing.Point(488, 169);
+            button3.Margin = new System.Windows.Forms.Padding(2);
+            button3.Name = "button3";
+            button3.Size = new System.Drawing.Size(117, 34);
+            button3.TabIndex = 9;
+            button3.Text = "OK";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += LoadPartitionArray;
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Location = new System.Drawing.Point(524, 9);
+            label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            label4.Name = "label4";
+            label4.Size = new System.Drawing.Size(39, 15);
+            label4.TabIndex = 10;
+            label4.Text = "Name";
             // 
             // NewPartitionDialog
             // 
-            this.AcceptButton = this.button1;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.CancelButton = this.button2;
-            this.ClientSize = new System.Drawing.Size(514, 470);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "NewPartitionDialog";
-            this.ShowIcon = false;
-            this.Text = "Add New Partition";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AcceptButton = button1;
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoSize = true;
+            CancelButton = button2;
+            ClientSize = new System.Drawing.Size(872, 220);
+            Controls.Add(label4);
+            Controls.Add(button3);
+            Controls.Add(textBox4);
+            Controls.Add(button2);
+            Controls.Add(button1);
+            Controls.Add(textBox3);
+            Controls.Add(label3);
+            Controls.Add(textBox2);
+            Controls.Add(label2);
+            Controls.Add(textBox1);
+            Controls.Add(label1);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            Margin = new System.Windows.Forms.Padding(2);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "NewPartitionDialog";
+            ShowIcon = false;
+            Text = "NewPartitionDialog";
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -148,5 +188,8 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        public System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label4;
     }
 }

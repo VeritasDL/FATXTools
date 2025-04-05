@@ -171,7 +171,7 @@ namespace FATX.FileSystem
 
             if (_signature != VolumeSignature)
             {
-                throw new FormatException($"Invalid FATX Signature for {_partitionName}: {_signature:X8}");
+                Console.WriteLine($"Invalid FATX Signature for {_partitionName}: {_signature:X8}");
             }
         }
 
