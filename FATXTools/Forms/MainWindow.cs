@@ -1,4 +1,5 @@
-﻿using FATX.FileSystem;
+﻿using FATX;
+using FATX.FileSystem;
 using FATXTools.Controls;
 using FATXTools.Dialogs;
 using FATXTools.DiskTypes;
@@ -304,7 +305,63 @@ namespace FATXTools.Forms
 
         private void devKitHeadderToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var array = new List<KeyValuePair<ulong, string>>
+            {
+                new KeyValuePair<ulong, string>(0x00080000, "PixDump"),
+                new KeyValuePair<ulong, string>(0x120EB0000, "Unknown1"),
+                new KeyValuePair<ulong, string>(0x130EB0000, "Unknown2"),
+                new KeyValuePair<ulong, string>(0x23FC8A900, "Unknown3"),
+                new KeyValuePair<ulong, string>(0x25FEEF800, "Unknown4"),
+                new KeyValuePair<ulong, string>(0x25FEF0800, "Unknown5"),
+                new KeyValuePair<ulong, string>(0x25FF0F800, "Unknown6"),
+                new KeyValuePair<ulong, string>(0x26CD3F800, "Unknown7"),
+                new KeyValuePair<ulong, string>(0x275E6E800, "Unknown8"),
+                new KeyValuePair<ulong, string>(0x27BA98800, "Unknown9"),
+                new KeyValuePair<ulong, string>(0x27BA9E800, "Unknown10"),
+                new KeyValuePair<ulong, string>(0x27BAA1800, "Unknown11"),
+                new KeyValuePair<ulong, string>(0x27BAA3800, "Unknown12"),
+                new KeyValuePair<ulong, string>(0x28C080000, "SystemExtPartition"),
+                new KeyValuePair<ulong, string>(0x298EB0000, "SystemAuxPartition"),
+                new KeyValuePair<ulong, string>(0x2A0EB0000, "Unknown13"),
+                new KeyValuePair<ulong, string>(0x2B0EB0000, "Unknown14"),
+                new KeyValuePair<ulong, string>(0x2C0EB0000, "BackCompatPartition"),
+                new KeyValuePair<ulong, string>(0x2D0EB0000, "ContentPartition"),
+                new KeyValuePair<ulong, string>(0x2E64B00C4, "Unknown17"),
+                new KeyValuePair<ulong, string>(0x2E64B10C4, "Unknown18"),
+                new KeyValuePair<ulong, string>(0x2E65F50C4, "Unknown19"),
+                new KeyValuePair<ulong, string>(0x2E65FB0C4, "Unknown20"),
+                new KeyValuePair<ulong, string>(0x2E65FE0C4, "Unknown21"),
+                new KeyValuePair<ulong, string>(0x2E66000C4, "Unknown22"),
+                new KeyValuePair<ulong, string>(0x2E6AC00C4, "Unknown23"),
+                new KeyValuePair<ulong, string>(0x2F38F00C4, "Unknown24"),
+                new KeyValuePair<ulong, string>(0x2FC9DF0C4, "Unknown25"),
+                new KeyValuePair<ulong, string>(0x30020B1C4, "Unknown26"),
+                new KeyValuePair<ulong, string>(0x3934B2E000, "AltFlash"),
+                new KeyValuePair<ulong, string>(0x3938B2E000, "Unknown15"),
+                new KeyValuePair<ulong, string>(0x39B8B2E000, "Unknown16"),
+            };
+            if (driveView != null && driveView.GetDrive() is DriveReader reader)
+            {
+                var partitions = reader.GetDevkitHeaderPartitions();
+                if (partitions.Count == 0)
+                {
+                    MessageBox.Show("No Devkit header partitions found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
+                var dialog = new FoundPartitionDialog(partitions);
+                var result = dialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    foreach (var (name, offset, length) in dialog.SelectedPartitions)
+                    {
+
+
+                        driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
+                    }
+
+                }
+            }
         }
 
         private void retail1888ToolStripMenuItem_Click(object sender, EventArgs e)

@@ -31,14 +31,14 @@ namespace FATXTools.Dialogs
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        public List<(string Name, long Offset, long Length)> SelectedPartitions { get; private set; } = new();
         /// 
         public void InitializeComponent()
         {
-            button1 = new System.Windows.Forms.Button();
-            button2 = new System.Windows.Forms.Button();
-            listView1 = new System.Windows.Forms.ListView();
-            label1 = new System.Windows.Forms.Label();
+            button1 = new Button();
+            button2 = new Button();
+            listView1 = new ListView();
+            label1 = new Label();
+            selectAllBox = new CheckBox();
             SuspendLayout();
             // 
             // button1
@@ -49,6 +49,7 @@ namespace FATXTools.Dialogs
             button1.TabIndex = 0;
             button1.Text = "Ok";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button2
             // 
@@ -61,16 +62,14 @@ namespace FATXTools.Dialogs
             // 
             // listView1
             // 
+            listView1.CheckBoxes = true;
+            listView1.FullRowSelect = true;
             listView1.Location = new System.Drawing.Point(12, 51);
             listView1.Name = "listView1";
             listView1.Size = new System.Drawing.Size(764, 338);
             listView1.TabIndex = 2;
             listView1.UseCompatibleStateImageBehavior = false;
             listView1.View = View.Details;
-            listView1.Columns.Add("Name", 120);
-            listView1.Columns.Add("Offset", 100);
-            listView1.Columns.Add("Length", 100);
-            listView1.CheckBoxes = true;
             // 
             // label1
             // 
@@ -81,11 +80,22 @@ namespace FATXTools.Dialogs
             label1.TabIndex = 3;
             label1.Text = "Found Partitions";
             // 
+            // checkBox1
+            // 
+            selectAllBox.AutoSize = true;
+            selectAllBox.Location = new System.Drawing.Point(12, 20);
+            selectAllBox.Name = "checkBox1";
+            selectAllBox.Size = new System.Drawing.Size(74, 19);
+            selectAllBox.TabIndex = 4;
+            selectAllBox.Text = "Select All";
+            selectAllBox.UseVisualStyleBackColor = true;
+            // 
             // FoundPartitionDialog
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(800, 450);
+            Controls.Add(selectAllBox);
             Controls.Add(label1);
             Controls.Add(listView1);
             Controls.Add(button2);
@@ -102,5 +112,6 @@ namespace FATXTools.Dialogs
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.Label label1;
+        private CheckBox selectAllBox;
     }
 }

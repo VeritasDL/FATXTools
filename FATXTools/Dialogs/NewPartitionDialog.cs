@@ -47,12 +47,7 @@ namespace FATXTools.Dialogs
 
         public static long ParseHexInput(string input)
         {
-            input = input.Replace("(", "").Replace(")", "").Replace(",", "").Replace(" ", "");
-            if (input == "")
-            if (input.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
-            {
-                input = input.Substring(2);
-            }
+            input = input.Replace("(", "").Replace(")", "").Replace(",", "").Replace(" ", "").Replace("0x", "");
             return long.Parse(input, System.Globalization.NumberStyles.HexNumber);
         }
 

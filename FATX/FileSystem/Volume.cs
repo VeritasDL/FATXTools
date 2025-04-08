@@ -174,6 +174,8 @@ namespace FATX.FileSystem
                 Console.WriteLine($"Invalid FATX Signature for {_partitionName}: {_signature:X8}");
             }
         }
+        //		_partitionLength	0x0000003663c7e000	long
+        //		_partitionLength	0x0000000010000000	long
 
         private void ReadLegacyVolumeMetadata()
         {
