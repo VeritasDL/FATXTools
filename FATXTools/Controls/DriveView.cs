@@ -71,6 +71,8 @@ namespace FATXTools
             SelectedIndexChanged();
         }
 
+
+
         private void DriveDatabase_OnPartitionRemoved(object sender, RemovePartitionEventArgs e)
         {
             var index = e.Index;
