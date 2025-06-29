@@ -22,7 +22,6 @@ namespace FATXTools.Forms
 {
     public partial class MainWindow : Form
     {
-        public static RawImage rawImage1;
         public DriveView driveView;
         private List<string> fileHistory = new List<string>();
         private const int MaxHistoryCount = 30;
@@ -176,8 +175,8 @@ namespace FATXTools.Forms
             saveToolStripMenuItem.Enabled = true;
 
             addPartitionToolStripMenuItem.Enabled = true;
-            searchForPartitionsToolStripMenuItem.Enabled = true;
-            managePartitionsToolStripMenuItem.Enabled = true;
+            //searchForPartitionsToolStripMenuItem.Enabled = true;
+            //managePartitionsToolStripMenuItem.Enabled = true;
         }
 
         private void DisableDatabaseOptions()
@@ -186,8 +185,8 @@ namespace FATXTools.Forms
             saveToolStripMenuItem.Enabled = false;
 
             addPartitionToolStripMenuItem.Enabled = false;
-            searchForPartitionsToolStripMenuItem.Enabled = false;
-            managePartitionsToolStripMenuItem.Enabled = false;
+            //searchForPartitionsToolStripMenuItem.Enabled = false;
+            //managePartitionsToolStripMenuItem.Enabled = false;
         }
 
         private void EnableOpenOptions()

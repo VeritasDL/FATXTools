@@ -176,36 +176,5 @@ namespace FATXTools.Database
                 throw new FileLoadException("Database: Missing Drive object");
             }
         }
-
-        //public void RestoreFromJson(string path, string recoveredFolder)
-        //{
-        //    if (!File.Exists(path))
-        //        throw new FileNotFoundException("Recovery JSON file not found", path);
-        //    if (!Directory.Exists(recoveredFolder))
-        //        throw new DirectoryNotFoundException("Recovered files folder not found: " + recoveredFolder);
-        //    string json = File.ReadAllText(path);
-        //    using var doc = JsonDocument.Parse(json);
-
-        //    JsonElement root = doc.RootElement;
-        //    if (!root.TryGetProperty("Drive", out JsonElement driveJsonElement))
-        //        throw new FileLoadException("Database: Missing Drive object");
-        //    if (!driveJsonElement.TryGetProperty("Partitions", out var partitionsElement))
-        //        throw new FileLoadException("Database: Drive has no Partition list");
-
-        //    foreach (var partitionElement in partitionsElement.EnumerateArray())
-        //    {
-        //        long partitionOffset = partitionElement.GetProperty("Offset").GetInt64();
-
-        //        var partitionDb = partitionDatabases.FirstOrDefault(pd => pd.Volume.Offset == partitionOffset);
-
-        //        if (partitionDb != null)
-        //        {
-        //            ReBuildIfNotExists(partitionElement, recoveredFolder);
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine($"[WARN] Partition at offset {partitionOffset} not found in current image.");
-        //        }
-        //    }
     }
 }
