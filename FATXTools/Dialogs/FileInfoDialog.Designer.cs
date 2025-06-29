@@ -1,4 +1,6 @@
-﻿namespace FATXTools.Dialogs
+﻿using System.Windows.Forms;
+
+namespace FATXTools.Dialogs
 {
     partial class FileInfoDialog
     {
@@ -28,50 +30,48 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.SuspendLayout();
+            listView1 = new System.Windows.Forms.ListView();
+            columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            SuspendLayout();
             // 
             // listView1
             // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2});
-            this.listView1.FullRowSelect = true;
-            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(15, 17);
-            this.listView1.Margin = new System.Windows.Forms.Padding(4);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(786, 1139);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
+            listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeader1, columnHeader2 });
+            listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            listView1.Location = new System.Drawing.Point(8, 8);
+            listView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            listView1.Name = "listView1";
+            listView1.Size = new System.Drawing.Size(425, 536);
+            listView1.TabIndex = 0;
+            listView1.UseCompatibleStateImageBehavior = false;
+            listView1.View = System.Windows.Forms.View.Details;
+            listView1.KeyDown += listView1_KeyDown;
+            listView1.FullRowSelect = true;
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "Property";
-            this.columnHeader1.Width = 100;
+            columnHeader1.Text = "Property";
+            columnHeader1.Width = 100;
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "Value";
-            this.columnHeader2.Width = 500;
+            columnHeader2.Text = "Value";
+            columnHeader2.Width = 500;
             // 
             // FileInfoDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(817, 1173);
-            this.Controls.Add(this.listView1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4);
-            this.MaximizeBox = false;
-            this.Name = "FileInfoDialog";
-            this.Text = "File Information";
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            AutoSize = true;
+            ClientSize = new System.Drawing.Size(440, 497);
+            Controls.Add(listView1);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            MaximizeBox = false;
+            Name = "FileInfoDialog";
+            Text = "File Information";
+            ResumeLayout(false);
 
         }
 

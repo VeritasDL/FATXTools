@@ -35,6 +35,9 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="file1.md" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Controls\CarverResults.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -52,6 +55,11 @@
     </Compile>
     <Compile Update="Controls\RecoveryResults.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -75,5 +83,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.Text.Json" Version="9.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

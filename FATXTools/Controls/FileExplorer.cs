@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -746,6 +747,27 @@ namespace FATXTools.Controls
                 {
                     return -result;
                 }
+            }
+        }
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                CopySelectedOffsets();
+                e.Handled = true;
+            }
+        }
+        private void CopySelectedOffsets()
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                var offsets = listView1.SelectedItems
+                    .Cast<ListViewItem>()
+                    .Where(item => item.SubItems[6].Text.Length > 0)
+                    .Select(item => item.SubItems[6].Text);
+
+                Clipboard.SetText(string.Join(Environment.NewLine, offsets));
+                SystemSounds.Beep.Play();
             }
         }
     }

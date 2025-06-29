@@ -1,8 +1,10 @@
 ﻿using FATX;
 using FATX.FileSystem;
+using FATXTools.DiskTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -84,6 +86,20 @@ namespace FATXTools.Database
             return false;
         }
 
+        private bool RecoverIfNotExists(JsonElement partitionElement, string recoveredFolder)
+        {
+            foreach (var partitionDatabase in partitionDatabases)
+            {
+                if (partitionDatabase.Volume.Offset == partitionElement.GetProperty("Offset").GetInt64())
+                {
+                    partitionDatabase.RecoverFromJson(partitionElement, recoveredFolder);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         public void LoadFromJson(string path)
         {
             string json = File.ReadAllText(path);
@@ -105,7 +121,6 @@ namespace FATXTools.Database
                             var offset = partitionElement.GetProperty("Offset").GetInt64();
                             var length = partitionElement.GetProperty("Length").GetInt64();
                             var name = partitionElement.GetProperty("Name").GetString();
-
                             Volume newVolume = new Volume(this.drive, name, offset, length);
 
                             OnPartitionAdded?.Invoke(this, new AddPartitionEventArgs(newVolume));
@@ -118,13 +133,79 @@ namespace FATXTools.Database
                 }
                 else
                 {
-                    throw new FileLoadException("Database: Drive has no Partition list!");
+                    throw new FileLoadException("Database: Drive has no Partition list");
                 }
             }
             else
             {
-                throw new FileLoadException("Database: Missing Drive object!");
+                throw new FileLoadException("Database: Missing Drive object");
             }
         }
+        public void RecoverFromJson(string jsonPath, string recoveredFolder)
+        {
+            string json = File.ReadAllText(jsonPath);
+            Dictionary<string, object> databaseObject = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            if (databaseObject.ContainsKey("Drive"))
+            {
+                JsonElement driveJsonElement = (JsonElement)databaseObject["Drive"];
+                if (driveJsonElement.TryGetProperty("Partitions", out var partitionsElement))
+                {
+                    foreach (var partitionElement in partitionsElement.EnumerateArray())
+                    {
+                        // Check if partition exists for recovery
+                        if (!RecoverIfNotExists(partitionElement, recoveredFolder) || drive.Partitions.Count == 0)
+                        {
+                            // It does not exist, let's recover it in.
+                            var offset = partitionElement.GetProperty("Offset").GetInt64();
+                            var length = partitionElement.GetProperty("Length").GetInt64();
+                            var name = partitionElement.GetProperty("Name").GetString();
+                            Volume newVolume = new Volume(this.drive, name, offset, length);
+                            OnPartitionAdded?.Invoke(this, new AddPartitionEventArgs(newVolume));
+                            // Might need some clean up here. Should not rely on the event to add the partition to the database.
+                            partitionDatabases[partitionDatabases.Count - 1].RecoverFromJson(partitionElement, recoveredFolder);
+                        }
+                    }
+                }
+                else
+                {
+                    throw new FileLoadException("Database: Drive has no Partition list");
+                }
+            }
+            else
+            {
+                throw new FileLoadException("Database: Missing Drive object");
+            }
+        }
+
+        //public void RestoreFromJson(string path, string recoveredFolder)
+        //{
+        //    if (!File.Exists(path))
+        //        throw new FileNotFoundException("Recovery JSON file not found", path);
+        //    if (!Directory.Exists(recoveredFolder))
+        //        throw new DirectoryNotFoundException("Recovered files folder not found: " + recoveredFolder);
+        //    string json = File.ReadAllText(path);
+        //    using var doc = JsonDocument.Parse(json);
+
+        //    JsonElement root = doc.RootElement;
+        //    if (!root.TryGetProperty("Drive", out JsonElement driveJsonElement))
+        //        throw new FileLoadException("Database: Missing Drive object");
+        //    if (!driveJsonElement.TryGetProperty("Partitions", out var partitionsElement))
+        //        throw new FileLoadException("Database: Drive has no Partition list");
+
+        //    foreach (var partitionElement in partitionsElement.EnumerateArray())
+        //    {
+        //        long partitionOffset = partitionElement.GetProperty("Offset").GetInt64();
+
+        //        var partitionDb = partitionDatabases.FirstOrDefault(pd => pd.Volume.Offset == partitionOffset);
+
+        //        if (partitionDb != null)
+        //        {
+        //            ReBuildIfNotExists(partitionElement, recoveredFolder);
+        //        }
+        //        else
+        //        {
+        //            Console.WriteLine($"[WARN] Partition at offset {partitionOffset} not found in current image.");
+        //        }
+        //    }
     }
 }

@@ -28,7 +28,7 @@ namespace FATX.FileSystem
         {
             this._parent = null;
 
-            ReadDirectoryEntry(platform, data, offset);
+            ReadDirectoryEntry(platform, data, offset); //offset is the offset in the data array where this dirent starts 
         }
 
         private void ReadDirectoryEntry(Platform platform, byte[] data, int offset)
@@ -72,11 +72,16 @@ namespace FATX.FileSystem
 
         public long Offset { get => _offset; set => _offset = value; }
 
-        public uint FileNameLength => _fileNameLength;
+        public uint FileNameLength
+        {
+            get => _fileNameLength;
+            set => _fileNameLength = (byte)value; // Explicit cast to byte to resolve CS0266  
+        }
 
         public FileAttribute FileAttributes
         {
             get { return (FileAttribute)_fileAttributes; }
+            set { _fileAttributes = (byte)value; }
         }
 
         public string FileName
@@ -98,8 +103,6 @@ namespace FATX.FileSystem
                     {
                         if (_fileNameLength > 42)
                         {
-                            // Warn user!
-                            //Console.WriteLine("Invalid file name length!");
                             _fileNameLength = 42;
                         }
 
@@ -109,19 +112,60 @@ namespace FATX.FileSystem
 
                 return _fileName;
             }
+            set
+            {
+                if (_fileNameLength == Constants.DirentDeleted)
+                {
+                    var trueFileNameLength = Array.IndexOf(_fileNameBytes, (byte)0xff);
+                    if (trueFileNameLength == -1)
+                    {
+                        trueFileNameLength = 42;
+                    }
+                    _fileName = Encoding.ASCII.GetString(_fileNameBytes, 0, trueFileNameLength);
+                }
+                else
+                {
+                    if (_fileNameLength > 42)
+                    {
+                        _fileNameLength = 42;
+                    }
+
+                    _fileName = Encoding.ASCII.GetString(_fileNameBytes, 0, _fileNameLength);
+                }
+            }
         }
 
-        public byte[] FileNameBytes => _fileNameBytes;
+        public byte[] FileNameBytes { get => _fileNameBytes; set => _fileNameBytes = (byte[])value; }
 
-        public uint FirstCluster => _firstCluster;
+        public uint FirstCluster
+        {
+            get => _firstCluster;
+            set => _firstCluster = value;
+        }
 
-        public uint FileSize => _fileSize;
+        public uint FileSize
+        {
+            get => _fileSize;
+            set => _fileSize = value;
+        }
 
-        public TimeStamp CreationTime => _creationTime;
+        public TimeStamp CreationTime
+        {
+            get => _creationTime;
+            set => _creationTime = value;
+        }
 
-        public TimeStamp LastWriteTime => _lastWriteTime;
+        public TimeStamp LastWriteTime
+        {
+            get => _lastWriteTime;
+            set => _lastWriteTime = value;
+        }
 
-        public TimeStamp LastAccessTime => _lastAccessTime;
+        public TimeStamp LastAccessTime
+        {
+            get => _lastAccessTime;
+            set => _lastAccessTime = value;
+        }
 
         /// <summary>
         /// Get all dirents from this directory.
@@ -169,6 +213,7 @@ namespace FATX.FileSystem
             foreach (DirectoryEntry dirent in children)
             {
                 dirent.SetParent(this);
+                //Console.WriteLine($"Adding child: {dirent.FileName} {dirent.Offset} {dirent.FirstCluster}  to parent: {this.FileName} {this.Offset} {this.FirstCluster}");
                 _children.Add(dirent);
             }
         }

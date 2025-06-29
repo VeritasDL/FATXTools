@@ -19,7 +19,7 @@ namespace FATXTools.Dialogs
                 string deviceName = String.Format(@"\\.\PhysicalDrive{0}", i);
                 SafeFileHandle handle = WinApi.CreateFile(
                     deviceName,
-                    FileAccess.Read,
+                    FileAccess.ReadWrite,
                     FileShare.None,
                     IntPtr.Zero,
                     FileMode.Open,

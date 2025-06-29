@@ -146,7 +146,7 @@ namespace FATX.Analyzers
             // Fill up the progress bar
             progress?.Report((int)(_length / interval));
 
-            Console.WriteLine("Complete!");
+            Console.WriteLine("Complete");
 
             return _carvedFiles;
         }

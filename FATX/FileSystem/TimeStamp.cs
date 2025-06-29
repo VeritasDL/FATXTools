@@ -90,27 +90,29 @@ namespace FATX.FileSystem
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
-                    Console.WriteLine("invalid date "+this.Year+"/"+this.Month+"/"+this.Day+" "+this.Hour+":"+this.Minute+"."+this.Second);
-                    int year = (int)((this._Time & 0xffff) & 0x7f) + 2000;
-                    int month = (int)((this._Time & 0xffff) >> 7) & 0xf;
-                    int day = (int)((this._Time & 0xffff) >> 0xb);
-                    int hour = (int)((this._Time >> 16) & 0x1f);
-                    int minute = (int)((this._Time >> 16) >> 5) & 0x3f;
-                    int second = (int)((this._Time >> 16) >> 10) & 0xfffe;
+                    _DateTime = _minWinFileTime;
+                    //Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.StackTrace);
+                    //Console.WriteLine("invalid date "+this.Year+"/"+this.Month+"/"+this.Day+" "+this.Hour+":"+this.Minute+"."+this.Second);
+                    //int year = (int)((this._Time & 0xffff) & 0x7f) + 2000;
+                    //int month = (int)((this._Time & 0xffff) >> 7) & 0xf;
+                    //int day = (int)((this._Time & 0xffff) >> 0xb);
+                    //int hour = (int)((this._Time >> 16) & 0x1f);
+                    //int minute = (int)((this._Time >> 16) >> 5) & 0x3f;
+                    //int second = (int)((this._Time >> 16) >> 10) & 0xfffe;
 
                     try
                     {
-                        _DateTime = new DateTime(year, month, day, hour, minute, second);
+                        _DateTime = _minWinFileTime;
                     }
                     catch (Exception e2)
                     {
-                        Console.WriteLine(e2.Message);
-                        Console.WriteLine(e2.StackTrace);
-                        Console.WriteLine("invalid date "+year+"/"+month+"/"+day+" "+hour+":"+minute+"."+second);
-                        Console.WriteLine("falling back to 1601/01/01");
                         _DateTime = _minWinFileTime;
+                        //Console.WriteLine(e2.Message);
+                        //Console.WriteLine(e2.StackTrace);
+                        //Console.WriteLine("invalid date "+year+"/"+month+"/"+day+" "+hour+":"+minute+"."+second);
+                        //Console.WriteLine("falling back to 1601/01/01");
+                        //_DateTime = _minWinFileTime;
                     }
 
                     return _DateTime.Value;

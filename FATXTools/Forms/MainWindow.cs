@@ -16,13 +16,14 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using FATXTools.Database;
 
 namespace FATXTools.Forms
 {
     public partial class MainWindow : Form
     {
-
-        private DriveView driveView;
+        public static RawImage rawImage1;
+        public DriveView driveView;
         private List<string> fileHistory = new List<string>();
         private const int MaxHistoryCount = 30;
         private const string HistoryFilePath = "FATxToolHistory.txt";
@@ -155,7 +156,11 @@ namespace FATXTools.Forms
                     var usedSpace = volume.GetUsedSpace();
                     var freeSpace = volume.GetFreeSpace();
                     var totalSpace = volume.GetTotalSpace();
-
+                    var maxclust = volume.MaxClusters;
+                    Console.WriteLine($"usedSpace: {usedSpace}");
+                    Console.WriteLine($"freeSpace: {freeSpace}");
+                    Console.WriteLine($"totalSpace: {totalSpace:X}");
+                    Console.WriteLine($"maxClusters: {maxclust:X}");
                     statusStrip1.Items.Add($"Volume Offset: 0x{volume.Offset:X}");
                     statusStrip1.Items.Add($"Volume Length: 0x{volume.Length:X}");
                     statusStrip1.Items.Add($"Used Space: {Utility.FormatBytes(usedSpace)}");
@@ -189,8 +194,7 @@ namespace FATXTools.Forms
         {
             openImageToolStripMenuItem.Enabled = true;
             openDeviceToolStripMenuItem.Enabled = true;
-            searchForPartitionsToolStripMenuItem.Enabled = true;
-            managePartitionsToolStripMenuItem.Enabled = true;
+
         }
 
         private void DisableOpenOptions()
@@ -206,7 +210,7 @@ namespace FATXTools.Forms
             string fileName = Path.GetFileName(path);
 
             RawImage rawImage = new RawImage(path);
-            driveView.AddDrive(fileName, rawImage);
+            driveView.AddDrive(fileName, rawImage); //called when loading a .img
             AddToFileHistory(path);
             EnableDatabaseOptions();
         }
@@ -216,7 +220,7 @@ namespace FATXTools.Forms
             CreateNewDriveView(device);
 
             SafeFileHandle handle = WinApi.CreateFile(device,
-                       FileAccess.Read,
+                       FileAccess.ReadWrite,
                        FileShare.None,
                        IntPtr.Zero,
                        FileMode.Open,
@@ -422,7 +426,10 @@ namespace FATXTools.Forms
             {
                 Filter = "JSON File (*.json)|*.json"
             };
-
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
+            {
+                Description = "Select a folder to search for recovered files (recursive search)"
+            };
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 var dialogResult = MessageBox.Show($"Loading a database will overwrite current analysis progress.\n"
@@ -430,9 +437,42 @@ namespace FATXTools.Forms
                     "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
+                    //prompt user if they want to write or not 
                     driveView.LoadFromJson(openFileDialog.FileName);
 
                     Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+                }
+            }
+        }
+
+        private void RecoverFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
+                openFileDialog.Title = "Select Recovery JSON";
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var dialogResult = MessageBox.Show(
+                        $"Recovering from a JSON will directly overwrite/write to the image.\n"
+                        + $"Are you sure you want to use '{Path.GetFileName(openFileDialog.FileName)}' to attempt recovery?",
+                        "Confirm Recovery", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+                        {
+                            folderBrowserDialog.Description = "Select the folder containing recovered files.";
+                            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                string jsonPath = openFileDialog.FileName;
+                                string recoveredFolder = folderBrowserDialog.SelectedPath;
+                                // Call recovery function on the drive view
+                                driveView.RecoverFromJson(jsonPath, recoveredFolder);
+                            }
+                        }
+                    }
                 }
             }
         }

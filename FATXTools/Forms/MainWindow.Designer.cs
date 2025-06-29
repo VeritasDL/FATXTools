@@ -44,6 +44,8 @@
             saveToJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             loadFromJSONToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            recoverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            fromJsonToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             settingsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -107,7 +109,7 @@
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
             textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            textBox1.Size = new System.Drawing.Size(1337, 168);
+            textBox1.Size = new System.Drawing.Size(1337, 172);
             textBox1.TabIndex = 2;
             textBox1.WordWrap = false;
             // 
@@ -132,7 +134,7 @@
             // 
             // fileToolStripMenuItem
             // 
-            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { openImageToolStripMenuItem, openDeviceToolStripMenuItem, historyToolStripMenuItem, toolStripSeparator3, saveToolStripMenuItem, loadToolStripMenuItem, toolStripSeparator2, settingsToolStripMenuItem1, toolStripSeparator1, exitToolStripMenuItem });
+            fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { openImageToolStripMenuItem, openDeviceToolStripMenuItem, historyToolStripMenuItem, toolStripSeparator3, saveToolStripMenuItem, loadToolStripMenuItem, recoverToolStripMenuItem, toolStripSeparator2, settingsToolStripMenuItem1, toolStripSeparator1, exitToolStripMenuItem });
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             fileToolStripMenuItem.Size = new System.Drawing.Size(37, 22);
             fileToolStripMenuItem.Text = "File";
@@ -187,9 +189,23 @@
             // loadFromJSONToolStripMenuItem
             // 
             loadFromJSONToolStripMenuItem.Name = "loadFromJSONToolStripMenuItem";
-            loadFromJSONToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            loadFromJSONToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             loadFromJSONToolStripMenuItem.Text = "Load From JSON";
             loadFromJSONToolStripMenuItem.Click += loadFromJSONToolStripMenuItem_Click;
+            // 
+            // recoverToolStripMenuItem
+            // 
+            recoverToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { fromJsonToolStripMenuItem });
+            recoverToolStripMenuItem.Name = "recoverToolStripMenuItem";
+            recoverToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            recoverToolStripMenuItem.Text = "Recover";
+            // 
+            // fromJsonToolStripMenuItem
+            // 
+            fromJsonToolStripMenuItem.Name = "fromJsonToolStripMenuItem";
+            fromJsonToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            fromJsonToolStripMenuItem.Text = "From Json";
+            fromJsonToolStripMenuItem.Click += RecoverFromJSONToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
@@ -257,37 +273,33 @@
             // devKitHeadderToolStripMenuItem
             // 
             devKitHeadderToolStripMenuItem.Name = "devKitHeadderToolStripMenuItem";
-            devKitHeadderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            devKitHeadderToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             devKitHeadderToolStripMenuItem.Text = "DevKit Headder";
             devKitHeadderToolStripMenuItem.Click += devKitHeadderToolStripMenuItem_Click;
             // 
             // dev1746toolStripMenuItem
             // 
             dev1746toolStripMenuItem.Name = "dev1746toolStripMenuItem";
-            dev1746toolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            dev1746toolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             dev1746toolStripMenuItem.Text = "Dev [1746]";
-            //dev1746toolStripMenuItem.Click += dev1746toolStripMenuItem_Click;
             // 
             // dev1838ToolStripMenuItem
             // 
             dev1838ToolStripMenuItem.Name = "dev1838ToolStripMenuItem";
-            dev1838ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            dev1838ToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             dev1838ToolStripMenuItem.Text = "Dev [1838]";
-            //dev1838ToolStripMenuItem.Click += dev1838ToolStripMenuItem_Click;
             // 
             // retail1888ToolStripMenuItem
             // 
             retail1888ToolStripMenuItem.Name = "retail1888ToolStripMenuItem";
-            retail1888ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            retail1888ToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             retail1888ToolStripMenuItem.Text = "Retail [1888]";
-            //retail1888ToolStripMenuItem.Click += retail1888ToolStripMenuItem_Click;
             // 
             // retail2125618ToolStripMenuItem
             // 
             retail2125618ToolStripMenuItem.Name = "retail2125618ToolStripMenuItem";
-            retail2125618ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            retail2125618ToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             retail2125618ToolStripMenuItem.Text = "Retail [21256.18]";
-            //retail2125618ToolStripMenuItem.Click += retail2125618ToolStripMenuItem_Click;
             // 
             // managePartitionsToolStripMenuItem
             // 
@@ -364,6 +376,8 @@
         private System.Windows.Forms.ToolStripMenuItem dev1838ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem retail1888ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem retail2125618ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem recoverToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fromJsonToolStripMenuItem;
     }
 }
 

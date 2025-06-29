@@ -1,8 +1,11 @@
-﻿using FATX.Analyzers;
+﻿using FATX;
+using FATX.Analyzers;
 using FATX.FileSystem;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 
 namespace FATXTools.Database
@@ -11,9 +14,9 @@ namespace FATXTools.Database
     {
         // We just want this for the volume info (offset, length, name)
         Volume volume;
-
+        private List<string> RecoveryLog = new List<string>();
         FileCarver fileCarver;  // TODO: Get rid of this. We should be able to get this information from the FileDatabase.
-
+        private const string RecoveryLogFilePath = "FATxToolRecovery_Log.txt";
         /// <summary>
         ///  Whether or not the MetadataAnalyzer's results are in.
         /// </summary>
@@ -102,7 +105,13 @@ namespace FATXTools.Database
                 SaveFileCarver(fileCarverObject);
             }
         }
-
+        private void AddRecoveryLog(string message)
+        {
+            RecoveryLog.Add(message);
+            Console.WriteLine(message);
+            // Save to file
+            //File.AppendAllLines(RecoveryLogFilePath, RecoveryLog);
+        }
         private void SaveMetadataAnalysis(List<Dictionary<string, object>> metadataAnalysisList)
         {
             foreach (var databaseFile in fileDatabase.GetRootFiles())
@@ -237,7 +246,121 @@ namespace FATXTools.Database
 
             return databaseFile;
         }
+        private void RestoreDirectoryEntryFromDatabase(JsonElement entry, string recoveredFolder, string relPath)
+        {
+            var volume = this.volume;
+            var driveReader = volume.GetReader();
+            var endianWriter = volume.GetWriter();
+            // Read common FATX directory entry fields
+            var offset = entry.GetProperty("Offset").GetInt64();
+            var fileName = entry.GetProperty("FileName").GetString();
+            var fileAttributes = entry.GetProperty("FileAttributes").GetByte();
+            var fileNameBytesB64 = entry.GetProperty("FileNameBytes").GetString();
+            var fileNameBytes = Convert.FromBase64String(fileNameBytesB64);
+            var fileNameLength = entry.GetProperty("FileNameLength").GetByte();
+            var firstCluster = entry.GetProperty("FirstCluster").GetUInt32();
+            var fileSize = entry.GetProperty("FileSize").GetUInt32();
+            var creationTime = entry.GetProperty("CreationTime").GetUInt32();
+            var lastWriteTime = entry.GetProperty("LastWriteTime").GetUInt32();
+            var lastAccessTime = entry.GetProperty("LastAccessTime").GetUInt32();
 
+            // Compose directory entry (0x40 bytes)
+            var dirent = new byte[0x40];
+            dirent[0x00] = fileNameLength;
+            dirent[0x01] = fileAttributes;
+            Buffer.BlockCopy(fileNameBytes, 0, dirent, 0x02, 0x2A); // 42 bytes for FileNameBytes at offset 0x02
+
+            // Write fields in big endian (as per Xbox 360)
+            BinaryPrimitives.WriteUInt32BigEndian(dirent.AsSpan(0x2C, 4), firstCluster);
+            BinaryPrimitives.WriteUInt32BigEndian(dirent.AsSpan(0x30, 4), fileSize);
+            BinaryPrimitives.WriteUInt32BigEndian(dirent.AsSpan(0x34, 4), creationTime);
+            BinaryPrimitives.WriteUInt32BigEndian(dirent.AsSpan(0x38, 4), lastWriteTime);
+            BinaryPrimitives.WriteUInt32BigEndian(dirent.AsSpan(0x3C, 4), lastAccessTime);
+
+            // Write directory entry to correct offset in image/device
+            driveReader.Seek(offset, SeekOrigin.Begin);
+            endianWriter.Write(dirent, dirent.Length);
+
+            // If directory, recurse into children
+            if ((fileAttributes & 0x10) != 0)
+            {
+                if (entry.TryGetProperty("Children", out var children))
+                {
+                    foreach (var child in children.EnumerateArray())
+                    {
+                        RestoreDirectoryEntryFromDatabase(child, recoveredFolder, Path.Combine(relPath, fileName));
+                    }
+                }
+            }
+            else // File: copy data to the correct clusters
+            {
+                if (entry.TryGetProperty("Clusters", out var clusters))
+                {
+                    // Source file is in e.g. Recovered Data\Cluster N\...\FileName
+                    string clusterDir = Path.Combine(recoveredFolder, $"Cluster {entry.GetProperty("Cluster").GetInt32()}", relPath);
+                    string sourceFile = Path.Combine(clusterDir, fileName);
+                    if (!File.Exists(sourceFile))
+                    {
+                        Console.WriteLine($"Missing recovered file: {sourceFile}");
+                        return;
+                    }
+                    byte[] fileData = File.ReadAllBytes(sourceFile);
+
+                    int clusterSize = (int)volume.BytesPerCluster;
+                    int bytesWritten = 0;
+                    foreach (var clusterVal in clusters.EnumerateArray())
+                    {
+                        uint clusterNum = clusterVal.GetUInt32();
+                        long clusterOffset = volume.ClusterToPhysicalOffset(clusterNum);
+                        driveReader.Seek(clusterOffset, SeekOrigin.Begin);
+                        endianWriter.Write(fileData, bytesWritten, clusterSize);
+                        bytesWritten += clusterSize;
+                        if (bytesWritten >= fileData.Length)
+                            break;
+                    }
+                }
+            }
+        }
+        public void RecoverFromDatabase(JsonElement metadataAnalysisObject, string recoveredFolder)
+        {
+            foreach (var directoryEntryObject in metadataAnalysisObject.EnumerateArray())
+            {
+                RestoreDirectoryEntryFromDatabase(directoryEntryObject, recoveredFolder, "");
+            }
+        }
+        public bool IsValidAttributes(FileAttribute attributes)
+        {
+            if (attributes == 0)
+            {
+                return true;
+            }
+
+            if (!Enum.IsDefined(typeof(FileAttribute), attributes))
+            {
+                return false;
+            }
+
+            return true;
+        }
+        public void RecoverFromJson(JsonElement partitionElement, string recoveredFolder)
+        {
+            // We are recovering a new database so clear previous results if needed
+
+            // Find the Analysis element, which contains analysis results
+            JsonElement analysisElement;
+            if (!partitionElement.TryGetProperty("Analysis", out analysisElement))
+            {
+                var name = partitionElement.GetProperty("Name").GetString();
+                throw new FileLoadException($"Database: Partition ${name} is missing Analysis object");
+            }
+
+            if (analysisElement.TryGetProperty("MetadataAnalyzer", out var metadataAnalysisList))
+            {
+                // Recovers the files from the json using the recovered folder
+                RecoverFromDatabase(metadataAnalysisList, recoveredFolder);
+            }
+
+        }
         private bool LoadFromDatabase(JsonElement metadataAnalysisObject)
         {
             if (metadataAnalysisObject.GetArrayLength() == 0)
@@ -262,7 +385,7 @@ namespace FATXTools.Database
             if (!partitionElement.TryGetProperty("Analysis", out analysisElement))
             {
                 var name = partitionElement.GetProperty("Name").GetString();
-                throw new FileLoadException($"Database: Partition ${name} is missing Analysis object!");
+                throw new FileLoadException($"Database: Partition ${name} is missing Analysis object");
             }
 
             if (analysisElement.TryGetProperty("MetadataAnalyzer", out var metadataAnalysisList))

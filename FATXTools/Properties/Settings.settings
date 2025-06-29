@@ -8,5 +8,8 @@
     <Setting Name="LogFile" Type="System.String" Scope="User">
       <Value Profile="(Default)">log.txt</Value>
     </Setting>
+    <Setting Name="DriveWrite" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

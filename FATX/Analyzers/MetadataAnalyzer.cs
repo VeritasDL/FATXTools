@@ -195,14 +195,14 @@ namespace FATX.Analyzers
             return true;
         }
 
-        private const int ValidAttributes = 55;
+        public const int ValidAttributes = 55;
 
         /// <summary>
         /// Validate FileAttributes.
         /// </summary>
         /// <param name="attributes"></param>
         /// <returns></returns>
-        private bool IsValidAttributes(FileAttribute attributes)
+        public bool IsValidAttributes(FileAttribute attributes)
         {
             if (attributes == 0)
             {

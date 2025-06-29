@@ -126,8 +126,7 @@ namespace FATX
                 // Cache1
                 long cache1Offset = (long)ReadUInt32() * Constants.SectorSize;
                 long cache1Length = (long)ReadUInt32() * Constants.SectorSize;
-                
-                AddPartition("Partition1", dataOffset, dataLength);
+                //AddPartition("Partition1", dataOffset, dataLength);
                 AddPartition("SystemPartition", shellOffset, shellLength);
                 // TODO: Add support for these
                 //AddPartition("Cache0", cache0Offset, cache0Length);

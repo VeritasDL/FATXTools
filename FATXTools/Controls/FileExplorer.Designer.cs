@@ -28,260 +28,244 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.treeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.runMetadataAnalyzerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.runFileCarverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.saveSelectedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAllToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.listView1 = new System.Windows.Forms.ListView();
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.listContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.runMetadataAnalyzerToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.runFileCarverToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.saveSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.viewInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
-            this.treeContextMenu.SuspendLayout();
-            this.listContextMenu.SuspendLayout();
-            this.SuspendLayout();
+            components = new System.ComponentModel.Container();
+            splitContainer2 = new System.Windows.Forms.SplitContainer();
+            treeView1 = new System.Windows.Forms.TreeView();
+            treeContextMenu = new System.Windows.Forms.ContextMenuStrip(components);
+            runMetadataAnalyzerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            runFileCarverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            saveSelectedToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            saveAllToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            listView1 = new System.Windows.Forms.ListView();
+            columnHeader8 = new System.Windows.Forms.ColumnHeader();
+            columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            columnHeader4 = new System.Windows.Forms.ColumnHeader();
+            columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            columnHeader6 = new System.Windows.Forms.ColumnHeader();
+            columnHeader7 = new System.Windows.Forms.ColumnHeader();
+            listContextMenu = new System.Windows.Forms.ContextMenuStrip(components);
+            runMetadataAnalyzerToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            runFileCarverToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            saveSelectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            saveAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            viewInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ((System.ComponentModel.ISupportInitialize)splitContainer2).BeginInit();
+            splitContainer2.Panel1.SuspendLayout();
+            splitContainer2.Panel2.SuspendLayout();
+            splitContainer2.SuspendLayout();
+            treeContextMenu.SuspendLayout();
+            listContextMenu.SuspendLayout();
+            SuspendLayout();
             // 
             // splitContainer2
             // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer2.Name = "splitContainer2";
+            splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            splitContainer2.Location = new System.Drawing.Point(0, 0);
+            splitContainer2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            splitContainer2.Name = "splitContainer2";
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.treeView1);
+            splitContainer2.Panel1.Controls.Add(treeView1);
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.listView1);
-            this.splitContainer2.Size = new System.Drawing.Size(2133, 1113);
-            this.splitContainer2.SplitterDistance = 356;
-            this.splitContainer2.TabIndex = 2;
+            splitContainer2.Panel2.Controls.Add(listView1);
+            splitContainer2.Size = new System.Drawing.Size(1244, 668);
+            splitContainer2.SplitterDistance = 208;
+            splitContainer2.SplitterWidth = 2;
+            splitContainer2.TabIndex = 2;
             // 
             // treeView1
             // 
-            this.treeView1.ContextMenuStrip = this.treeContextMenu;
-            this.treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView1.HideSelection = false;
-            this.treeView1.Location = new System.Drawing.Point(0, 0);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(356, 1113);
-            this.treeView1.TabIndex = 0;
-            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
+            treeView1.ContextMenuStrip = treeContextMenu;
+            treeView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            treeView1.HideSelection = false;
+            treeView1.Location = new System.Drawing.Point(0, 0);
+            treeView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            treeView1.Name = "treeView1";
+            treeView1.Size = new System.Drawing.Size(208, 668);
+            treeView1.TabIndex = 0;
+            treeView1.AfterSelect += treeView1_AfterSelect;
             // 
             // treeContextMenu
             // 
-            this.treeContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.treeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.runMetadataAnalyzerToolStripMenuItem,
-            this.runFileCarverToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.saveSelectedToolStripMenuItem1,
-            this.saveAllToolStripMenuItem2});
-            this.treeContextMenu.Name = "contextMenuStrip1";
-            this.treeContextMenu.Size = new System.Drawing.Size(339, 162);
+            treeContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
+            treeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { runMetadataAnalyzerToolStripMenuItem, runFileCarverToolStripMenuItem, toolStripSeparator2, saveSelectedToolStripMenuItem1, saveAllToolStripMenuItem2 });
+            treeContextMenu.Name = "contextMenuStrip1";
+            treeContextMenu.Size = new System.Drawing.Size(197, 98);
             // 
             // runMetadataAnalyzerToolStripMenuItem
             // 
-            this.runMetadataAnalyzerToolStripMenuItem.Name = "runMetadataAnalyzerToolStripMenuItem";
-            this.runMetadataAnalyzerToolStripMenuItem.Size = new System.Drawing.Size(338, 38);
-            this.runMetadataAnalyzerToolStripMenuItem.Text = "Run Metadata Analyzer";
-            this.runMetadataAnalyzerToolStripMenuItem.Click += new System.EventHandler(this.runMetadataAnalyzerToolStripMenuItem_Click);
+            runMetadataAnalyzerToolStripMenuItem.Name = "runMetadataAnalyzerToolStripMenuItem";
+            runMetadataAnalyzerToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            runMetadataAnalyzerToolStripMenuItem.Text = "Run Metadata Analyzer";
+            runMetadataAnalyzerToolStripMenuItem.Click += runMetadataAnalyzerToolStripMenuItem_Click;
             // 
             // runFileCarverToolStripMenuItem
             // 
-            this.runFileCarverToolStripMenuItem.Name = "runFileCarverToolStripMenuItem";
-            this.runFileCarverToolStripMenuItem.Size = new System.Drawing.Size(338, 38);
-            this.runFileCarverToolStripMenuItem.Text = "Run File Carver";
-            this.runFileCarverToolStripMenuItem.Click += new System.EventHandler(this.runFileCarverToolStripMenuItem_Click);
+            runFileCarverToolStripMenuItem.Name = "runFileCarverToolStripMenuItem";
+            runFileCarverToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            runFileCarverToolStripMenuItem.Text = "Run File Carver";
+            runFileCarverToolStripMenuItem.Click += runFileCarverToolStripMenuItem_Click;
             // 
             // toolStripSeparator2
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(335, 6);
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new System.Drawing.Size(193, 6);
             // 
             // saveSelectedToolStripMenuItem1
             // 
-            this.saveSelectedToolStripMenuItem1.Name = "saveSelectedToolStripMenuItem1";
-            this.saveSelectedToolStripMenuItem1.Size = new System.Drawing.Size(338, 38);
-            this.saveSelectedToolStripMenuItem1.Text = "Save Selected";
-            this.saveSelectedToolStripMenuItem1.Click += new System.EventHandler(this.treeSaveSelectedToolStripMenuItem1_Click);
+            saveSelectedToolStripMenuItem1.Name = "saveSelectedToolStripMenuItem1";
+            saveSelectedToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
+            saveSelectedToolStripMenuItem1.Text = "Save Selected";
+            saveSelectedToolStripMenuItem1.Click += treeSaveSelectedToolStripMenuItem1_Click;
             // 
             // saveAllToolStripMenuItem2
             // 
-            this.saveAllToolStripMenuItem2.Name = "saveAllToolStripMenuItem2";
-            this.saveAllToolStripMenuItem2.Size = new System.Drawing.Size(338, 38);
-            this.saveAllToolStripMenuItem2.Text = "Save All";
-            this.saveAllToolStripMenuItem2.Click += new System.EventHandler(this.saveAllToolStripMenuItem2_Click);
+            saveAllToolStripMenuItem2.Name = "saveAllToolStripMenuItem2";
+            saveAllToolStripMenuItem2.Size = new System.Drawing.Size(196, 22);
+            saveAllToolStripMenuItem2.Text = "Save All";
+            saveAllToolStripMenuItem2.Click += saveAllToolStripMenuItem2_Click;
             // 
             // listView1
             // 
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader8,
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6,
-            this.columnHeader7});
-            this.listView1.ContextMenuStrip = this.listContextMenu;
-            this.listView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listView1.FullRowSelect = true;
-            this.listView1.HideSelection = false;
-            this.listView1.Location = new System.Drawing.Point(0, 0);
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(1773, 1113);
-            this.listView1.TabIndex = 0;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView1_ColumnClick);
-            this.listView1.DoubleClick += new System.EventHandler(this.listView1_DoubleClick);
+            listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeader8, columnHeader1, columnHeader2, columnHeader3, columnHeader4, columnHeader5, columnHeader6, columnHeader7 });
+            listView1.ContextMenuStrip = listContextMenu;
+            listView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            listView1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.857143F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            listView1.FullRowSelect = true;
+            listView1.Location = new System.Drawing.Point(0, 0);
+            listView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            listView1.Name = "listView1";
+            listView1.Size = new System.Drawing.Size(1034, 668);
+            listView1.TabIndex = 0;
+            listView1.UseCompatibleStateImageBehavior = false;
+            listView1.View = System.Windows.Forms.View.Details;
+            listView1.ColumnClick += listView1_ColumnClick;
+            listView1.DoubleClick += listView1_DoubleClick;
+            listView1.KeyDown += listView1_KeyDown;
             // 
             // columnHeader8
             // 
-            this.columnHeader8.Text = "";
-            this.columnHeader8.Width = 44;
+            columnHeader8.Text = "";
+            columnHeader8.Width = 44;
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 200;
+            columnHeader1.Text = "Name";
+            columnHeader1.Width = 200;
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "Size";
-            this.columnHeader2.Width = 150;
+            columnHeader2.Text = "Size";
+            columnHeader2.Width = 150;
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "Date Created";
-            this.columnHeader3.Width = 150;
+            columnHeader3.Text = "Date Created";
+            columnHeader3.Width = 150;
             // 
             // columnHeader4
             // 
-            this.columnHeader4.Text = "Date Modified";
-            this.columnHeader4.Width = 150;
+            columnHeader4.Text = "Date Modified";
+            columnHeader4.Width = 150;
             // 
             // columnHeader5
             // 
-            this.columnHeader5.Text = "Date Accessed";
-            this.columnHeader5.Width = 150;
+            columnHeader5.Text = "Date Accessed";
+            columnHeader5.Width = 150;
             // 
             // columnHeader6
             // 
-            this.columnHeader6.Text = "Offset";
-            this.columnHeader6.Width = 150;
+            columnHeader6.Text = "Offset";
+            columnHeader6.Width = 150;
             // 
             // columnHeader7
             // 
-            this.columnHeader7.Text = "Cluster";
-            this.columnHeader7.Width = 150;
+            columnHeader7.Text = "Cluster";
+            columnHeader7.Width = 150;
             // 
             // listContextMenu
             // 
-            this.listContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
-            this.listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.runMetadataAnalyzerToolStripMenuItem1,
-            this.runFileCarverToolStripMenuItem1,
-            this.toolStripSeparator1,
-            this.saveSelectedToolStripMenuItem,
-            this.saveAllToolStripMenuItem,
-            this.saveAllToolStripMenuItem1,
-            this.toolStripSeparator3,
-            this.viewInformationToolStripMenuItem});
-            this.listContextMenu.Name = "listContextMenu";
-            this.listContextMenu.Size = new System.Drawing.Size(339, 244);
+            listContextMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
+            listContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { runMetadataAnalyzerToolStripMenuItem1, runFileCarverToolStripMenuItem1, toolStripSeparator1, saveSelectedToolStripMenuItem, saveAllToolStripMenuItem, saveAllToolStripMenuItem1, toolStripSeparator3, viewInformationToolStripMenuItem });
+            listContextMenu.Name = "listContextMenu";
+            listContextMenu.Size = new System.Drawing.Size(197, 148);
             // 
             // runMetadataAnalyzerToolStripMenuItem1
             // 
-            this.runMetadataAnalyzerToolStripMenuItem1.Name = "runMetadataAnalyzerToolStripMenuItem1";
-            this.runMetadataAnalyzerToolStripMenuItem1.Size = new System.Drawing.Size(338, 38);
-            this.runMetadataAnalyzerToolStripMenuItem1.Text = "Run Metadata Analyzer";
-            this.runMetadataAnalyzerToolStripMenuItem1.Click += new System.EventHandler(this.runMetadataAnalyzerToolStripMenuItem_Click);
+            runMetadataAnalyzerToolStripMenuItem1.Name = "runMetadataAnalyzerToolStripMenuItem1";
+            runMetadataAnalyzerToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
+            runMetadataAnalyzerToolStripMenuItem1.Text = "Run Metadata Analyzer";
+            runMetadataAnalyzerToolStripMenuItem1.Click += runMetadataAnalyzerToolStripMenuItem_Click;
             // 
             // runFileCarverToolStripMenuItem1
             // 
-            this.runFileCarverToolStripMenuItem1.Name = "runFileCarverToolStripMenuItem1";
-            this.runFileCarverToolStripMenuItem1.Size = new System.Drawing.Size(338, 38);
-            this.runFileCarverToolStripMenuItem1.Text = "Run File Carver";
-            this.runFileCarverToolStripMenuItem1.Click += new System.EventHandler(this.runFileCarverToolStripMenuItem_Click);
+            runFileCarverToolStripMenuItem1.Name = "runFileCarverToolStripMenuItem1";
+            runFileCarverToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
+            runFileCarverToolStripMenuItem1.Text = "Run File Carver";
+            runFileCarverToolStripMenuItem1.Click += runFileCarverToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(335, 6);
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
             // 
             // saveSelectedToolStripMenuItem
             // 
-            this.saveSelectedToolStripMenuItem.Name = "saveSelectedToolStripMenuItem";
-            this.saveSelectedToolStripMenuItem.Size = new System.Drawing.Size(338, 38);
-            this.saveSelectedToolStripMenuItem.Text = "Save Selected";
-            this.saveSelectedToolStripMenuItem.Click += new System.EventHandler(this.listSaveSelectedToolStripMenuItem_Click);
+            saveSelectedToolStripMenuItem.Name = "saveSelectedToolStripMenuItem";
+            saveSelectedToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            saveSelectedToolStripMenuItem.Text = "Save Selected";
+            saveSelectedToolStripMenuItem.Click += listSaveSelectedToolStripMenuItem_Click;
             // 
             // saveAllToolStripMenuItem
             // 
-            this.saveAllToolStripMenuItem.Name = "saveAllToolStripMenuItem";
-            this.saveAllToolStripMenuItem.Size = new System.Drawing.Size(338, 38);
-            this.saveAllToolStripMenuItem.Text = "Save Current Directory";
-            this.saveAllToolStripMenuItem.Click += new System.EventHandler(this.saveAllToolStripMenuItem_Click);
+            saveAllToolStripMenuItem.Name = "saveAllToolStripMenuItem";
+            saveAllToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            saveAllToolStripMenuItem.Text = "Save Current Directory";
+            saveAllToolStripMenuItem.Click += saveAllToolStripMenuItem_Click;
             // 
             // saveAllToolStripMenuItem1
             // 
-            this.saveAllToolStripMenuItem1.Name = "saveAllToolStripMenuItem1";
-            this.saveAllToolStripMenuItem1.Size = new System.Drawing.Size(338, 38);
-            this.saveAllToolStripMenuItem1.Text = "Save All";
+            saveAllToolStripMenuItem1.Name = "saveAllToolStripMenuItem1";
+            saveAllToolStripMenuItem1.Size = new System.Drawing.Size(196, 22);
+            saveAllToolStripMenuItem1.Text = "Save All";
             // 
             // toolStripSeparator3
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(335, 6);
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new System.Drawing.Size(193, 6);
             // 
             // viewInformationToolStripMenuItem
             // 
-            this.viewInformationToolStripMenuItem.Name = "viewInformationToolStripMenuItem";
-            this.viewInformationToolStripMenuItem.Size = new System.Drawing.Size(338, 38);
-            this.viewInformationToolStripMenuItem.Text = "View Information";
-            this.viewInformationToolStripMenuItem.Click += new System.EventHandler(this.viewInformationToolStripMenuItem_Click);
+            viewInformationToolStripMenuItem.Name = "viewInformationToolStripMenuItem";
+            viewInformationToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            viewInformationToolStripMenuItem.Text = "View Information";
+            viewInformationToolStripMenuItem.Click += viewInformationToolStripMenuItem_Click;
             // 
             // FileExplorer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.splitContainer2);
-            this.Name = "FileExplorer";
-            this.Size = new System.Drawing.Size(2133, 1113);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
-            this.treeContextMenu.ResumeLayout(false);
-            this.listContextMenu.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(splitContainer2);
+            Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            Name = "FileExplorer";
+            Size = new System.Drawing.Size(1244, 668);
+            splitContainer2.Panel1.ResumeLayout(false);
+            splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)splitContainer2).EndInit();
+            splitContainer2.ResumeLayout(false);
+            treeContextMenu.ResumeLayout(false);
+            listContextMenu.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 

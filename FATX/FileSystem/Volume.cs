@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FATX.Analyzers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -10,8 +11,8 @@ namespace FATX.FileSystem
         private readonly DriveReader _reader;
         private readonly string _partitionName;
         private readonly long _partitionOffset;
-        private readonly long _partitionLength;
-
+        private long _partitionLength;
+        private EndianWriter _writer;
         public const uint VolumeSignature = 0x58544146;
 
         private uint _signature;
@@ -59,7 +60,7 @@ namespace FATX.FileSystem
             this._partitionLength = length;
             this._partitionOffset = offset;
             this._usesLegacyFormat = legacy;
-
+            this._writer = new EndianWriter(reader.BaseStream, ByteOrder.Big);
             this._platform = (reader.ByteOrder == ByteOrder.Big) ?
                 Platform.X360 : Platform.Xbox;
 
@@ -98,6 +99,9 @@ namespace FATX.FileSystem
 
         public DriveReader GetReader()
         { return _reader; }
+
+        public EndianWriter GetWriter()
+        { return _writer; }
 
         public uint[] FileAllocationTable
         {
@@ -149,12 +153,13 @@ namespace FATX.FileSystem
         /// </summary>
         private void ReadBootSector()
         {
-            _reader.Seek(_partitionOffset);
-            Console.WriteLine("Attempting to load FATX volume at {0:X16}", _reader.Position);
+            _reader.Seek(_partitionOffset); // Seek to the start of the partition. 
+            //Console.WriteLine("Attempting to load FATX volume at {0:X16}", _reader.Position);
 
             if (!_usesLegacyFormat)
             {
-                ReadVolumeMetadata();
+                ReadVolumeMetadata(); // Read the volume metadata. 
+                //
             }
             else
             {
@@ -164,10 +169,10 @@ namespace FATX.FileSystem
 
         private void ReadVolumeMetadata()
         {
-            _signature = _reader.ReadUInt32();
-            _serialNumber = _reader.ReadUInt32();
-            _sectorsPerCluster = _reader.ReadUInt32();
-            _rootDirFirstCluster = _reader.ReadUInt32();
+            _signature = _reader.ReadUInt32(); // XTAF Partition Offset Pos 0x00Position = 0x00000002856a000c
+            _serialNumber = _reader.ReadUInt32(); // XTAF Partition Offset Pos 0x04
+            _sectorsPerCluster = _reader.ReadUInt32();// XTAF Partition Offset Pos 0x08
+            _rootDirFirstCluster = _reader.ReadUInt32(); // XTAF Partition Offset Pos 0x0C
 
             if (_signature != VolumeSignature)
             {
@@ -208,10 +213,17 @@ namespace FATX.FileSystem
         /// </summary>
         private void CalculateOffsets()
         {
-            _bytesPerCluster = _sectorsPerCluster * Constants.SectorSize;
-            _maxClusters = (uint)(_partitionLength / (long)_bytesPerCluster)
-                + Constants.ReservedClusters;
-
+            if (_sectorsPerCluster == 0x00000000)
+            {
+                this._sectorsPerCluster = 0x20;
+                this._bytesPerCluster = 0x4000;
+                this._partitionLength = 0xF1A8F2000;
+            }
+            else
+            {
+                _bytesPerCluster = _sectorsPerCluster * Constants.SectorSize;
+                _maxClusters = (uint)(_partitionLength / (long)_bytesPerCluster) + Constants.ReservedClusters;
+            }
             uint bytesPerFat;
             if (_maxClusters < 0xfff0)
             {
@@ -222,14 +234,18 @@ namespace FATX.FileSystem
             {
                 bytesPerFat = _maxClusters * 4;
                 _isFat16 = false;
+                Console.WriteLine($"CalculateOffsets-> bytesPerFat: {bytesPerFat:X}");
             }
 
             _bytesPerFat = (bytesPerFat + (Constants.PageSize - 1)) &
                 ~(Constants.PageSize - 1);
-
+            Console.WriteLine($"CalculateOffsets-> _bytesPerFat: {_bytesPerFat:X}");
             this._fatByteOffset = Constants.ReservedBytes;
             this._fileAreaByteOffset = this._fatByteOffset + this._bytesPerFat;
             this._fileAreaLength = this.Length - this.FileAreaByteOffset;
+            var Tempma = this._bytesPerFat + this._fatByteOffset + this._partitionOffset;
+            Console.WriteLine($"CalculateOffsets-> _bytesPerCluster: {_bytesPerCluster:X} _maxClusters: {_maxClusters:X} _bytesPerFat: {_bytesPerFat:X} _fatByteOffset: {_fatByteOffset:X} _fileAreaByteOffset: {_fileAreaByteOffset:X} _fileAreaLength: {_fileAreaLength:X}");
+            Console.WriteLine($"CalculateOffsets-> Tempma: {Tempma:X}");
         }
 
         /// <summary>
@@ -241,6 +257,7 @@ namespace FATX.FileSystem
 
             var fatOffset = ByteOffsetToPhysicalOffset(this._fatByteOffset);
             _reader.Seek(fatOffset);
+            //Console.WriteLine($"ReadFileAllocationTable-> fatOffset: {fatOffset:X} _maxClusters: {_maxClusters:X} _isFat16: {_isFat16}");
             if (this._isFat16)
             {
                 byte[] _tempFat = new byte[_maxClusters * 2];
@@ -263,7 +280,7 @@ namespace FATX.FileSystem
             {
                 byte[] _tempFat = new byte[_maxClusters * 4];
                 _reader.Read(_tempFat, (int)(_maxClusters * 4));
-
+                //Console.WriteLine($"_tempFat {_tempFat} {(_maxClusters * 4):X} ");
                 if (_reader.ByteOrder == ByteOrder.Big)
                 {
                     for (int i = 0; i < _maxClusters; i++)
@@ -278,7 +295,37 @@ namespace FATX.FileSystem
                 }
             }
         }
+        private const string VALID_CHARS = "abcdefghijklmnopqrstuvwxyz" +
+                                   "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                                   "0123456789" +
+                                   "!#$%&\'()-.@[]^_`{}~ " +
+                                   "\xff";
+        private bool IsValidFileNameBytes(byte[] bytes)
+        {
+            foreach (byte b in bytes)
+            {
+                if (VALID_CHARS.IndexOf((char)b) == -1)
+                {
+                    return false;
+                }
+            }
 
+            return true;
+        }
+        private bool IsValidFileNameLength(uint fileNameLength)
+        {
+            if (fileNameLength == 0x00 || fileNameLength == 0x01 || fileNameLength == 0xff)
+            {
+                return false;
+            }
+
+            if (fileNameLength > 0x2a && fileNameLength != 0xe5)
+            {
+                return false;
+            }
+
+            return true;
+        }
         /// <summary>
         /// Read a single directory stream.
         /// </summary>
@@ -290,20 +337,29 @@ namespace FATX.FileSystem
 
             byte[] data = ReadCluster(cluster);
             long clusterOffset = ClusterToPhysicalOffset(cluster);
+            //Console.WriteLine($"ReadDirectoryStream-> cluster: {cluster} clusterOffset: {clusterOffset:X}");
 
             for (int i = 0; i < 256; i++)
             {
                 DirectoryEntry dirent = new DirectoryEntry(this.Platform, data, (i * 0x40));
-
+                
                 if (dirent.FileNameLength == Constants.DirentNeverUsed ||
                     dirent.FileNameLength == Constants.DirentNeverUsed2)
                 {
                     // We are at the last dirent.
                     break;
                 }
-
+                if (!IsValidFileNameLength(dirent.FileNameLength))
+                {
+                    continue;
+                }
+                if (!IsValidFileNameBytes(dirent.FileNameBytes))
+                {
+                    continue;
+                }
+                //Console.WriteLine($"ReadDirectoryStream-> Offset: {dirent.Offset:X}");
                 dirent.Offset = clusterOffset + (i * 0x40);
-
+                //onsole.WriteLine($"ReadDirectoryStream-> dirent.FileName: {dirent.FileName} Offset: {dirent.Offset:X}");
                 stream.Add(dirent);
 
             }
@@ -317,12 +373,41 @@ namespace FATX.FileSystem
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="clusterIndex"></param>
+        //private void PopulateDirentStream(List<DirectoryEntry> stream, uint clusterIndex)
+        //{
+        //    foreach (DirectoryEntry dirent in stream)
+        //    {
+        //        dirent.Cluster = clusterIndex;
+        //      //  Console.WriteLine(String.Format("{0}", dirent.FileName));
+
+        //        if (dirent.IsDirectory() && !dirent.IsDeleted())
+        //        {
+        //            //Console.WriteLine($"PopulateDirentStream-> dirent.FileName: {dirent.FileName} is a directory. FirstCluster: {dirent.FirstCluster}");
+        //            List<uint> chainMap = GetClusterChain(dirent);
+
+        //            foreach (uint cluster in chainMap)
+        //            {
+        //              //  Console.WriteLine($"PopulateDirentStream-> foreach uint cluster in chainMap {chainMap} cluster: {cluster}");
+        //                List<DirectoryEntry> direntStream = ReadDirectoryStream(cluster);
+        //                // To print the contents of direntStream (which is a List<DirectoryEntry>), you should iterate and print each entry's details.
+        //                // Example usage inside PopulateDirentStream or similar context:
+        //                foreach (var entry in direntStream)
+        //                {
+        //                    //Console.WriteLine($"Entry: FileName {entry.FileName}, Offset {entry.Offset:X}, IsDirectory {entry.IsDirectory()}, IsDeleted {entry.IsDeleted()}, FirstCluster {entry.FirstCluster}, FileSize {entry.FileSize}");
+        //                }
+        //                dirent.AddChildren(direntStream);
+
+        //                PopulateDirentStream(direntStream, cluster);
+        //            }
+        //        }
+        //    }
+        //}
         private void PopulateDirentStream(List<DirectoryEntry> stream, uint clusterIndex)
         {
             foreach (DirectoryEntry dirent in stream)
             {
                 dirent.Cluster = clusterIndex;
-                //Console.WriteLine(String.Format("{0}", dirent.FileName));
+                Console.WriteLine(String.Format("{0}", dirent.FileName));
 
                 if (dirent.IsDirectory() && !dirent.IsDeleted())
                 {
@@ -339,7 +424,6 @@ namespace FATX.FileSystem
                 }
             }
         }
-
         /// <summary>
         /// Seek to any offset in the file area.
         /// </summary>
@@ -349,6 +433,7 @@ namespace FATX.FileSystem
         {
             // TODO: Check for invalid offset
             offset += FileAreaByteOffset + _partitionOffset;
+            //Console.WriteLine($"SeekFileArea-> After += offset: {offset}");
             _reader.Seek(offset, origin);
         }
 
@@ -359,6 +444,7 @@ namespace FATX.FileSystem
         public void SeekToCluster(uint cluster)
         {
             var offset = ClusterToPhysicalOffset(cluster);
+            //Console.WriteLine($"SeekToCluster-> offset: {offset}");
             _reader.Seek(offset);
         }
 
@@ -373,6 +459,7 @@ namespace FATX.FileSystem
             _reader.Seek(clusterOffset);
             byte[] clusterData = new byte[_bytesPerCluster];
             _reader.Read(clusterData, (int)_bytesPerCluster);
+            //Console.WriteLine($"ReadCluster-> clusterOffset: {clusterOffset} ReadCluster->clusterData: {clusterData}");
             return clusterData;
         }
 
@@ -388,7 +475,7 @@ namespace FATX.FileSystem
 
             if (firstCluster == 0 || firstCluster > this.MaxClusters)
             {
-                Console.WriteLine($" {dirent.GetFullPath()}: First cluster is invalid (FirstCluster={firstCluster} MaxClusters={this.MaxClusters})");
+                //Console.WriteLine($" First cluster invalid (FirstCluster= {firstCluster} MaxClusters= {this.MaxClusters})");
                 return clusterChain;
             }
 
@@ -412,7 +499,7 @@ namespace FATX.FileSystem
                 if (fatEntry == 0 || fatEntry > _fileAllocationTable.Length)
                 {
                     // TODO: Warn user.
-                    Console.WriteLine($"File {dirent.FileName} has a corrupt cluster chain!");
+                  //  Console.WriteLine($"File {dirent.FileName} has a corrupt cluster chain");
                     clusterChain = new List<uint>(1);
                     clusterChain.Add(firstCluster);
                     return clusterChain;

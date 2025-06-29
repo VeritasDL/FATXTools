@@ -11,7 +11,7 @@ namespace FATXTools.DiskTypes
         private long _sectorLength;
         private long _position;
         public PhysicalDisk(SafeFileHandle handle, long length, long sectorLength)
-            : base(new FileStream(handle, FileAccess.Read))
+            : base(new FileStream(handle, FileAccess.ReadWrite))
         {
             this._length = length;
             this._sectorLength = sectorLength;
@@ -82,5 +82,83 @@ namespace FATXTools.DiskTypes
             Read(buf, 1);
             return buf[0];
         }
+        public virtual void Write(byte[] buffer, long offset, int count)
+        {
+            BaseStream.Seek(offset, SeekOrigin.Begin);
+
+            //// Read the full sector into a temp buffer (for partial sector writes)
+            //var alignedCount = (int)(((count + (_sectorLength - 1)) & ~(_sectorLength - 1)));
+            //var tempBuf = new byte[alignedCount];
+
+            //// Read existing data (in case of partial sector write)
+            //BaseStream.Read(tempBuf, 0, alignedCount);
+
+            //// Copy new data into the temp buffer at the correct offset
+            //Buffer.BlockCopy(buffer, 0, tempBuf, (int)(_position % _sectorLength), count);
+
+            //// Seek back to the aligned offset for writing
+            BaseStream.Seek(offset, SeekOrigin.Begin);
+
+            //// Write the modified buffer back
+            BaseStream.Write(buffer, 0, count);
+            BaseStream.Flush();
+
+            // Increment position by how much was written
+            _position += count;
+        }
+
+        //public virtual void WriteBytes(byte[] buffer)
+        //{
+        //    Write(buffer, buffer.Length);
+        //}
+
+        //public virtual void WriteByte(byte value)
+        //{
+        //    Write(new byte[] { value }, 1);
+        //}
+       // public void Write(byte[] buffer, int offset, int count)
+       // {
+       //     Align position down to nearest sector
+       //     var offseta = _position;
+       //     if (_position % _sectorLength != 0)
+       //     {
+       //         offseta -= _position % _sectorLength;
+       //     }
+
+       //     Seek to the sector aligned offset
+       //     BaseStream.Seek(offseta, SeekOrigin.Begin);
+
+       //     Read the full sector into a temp buffer(for partial sector writes)
+       //     var alignedCount = (int)(((count + (_sectorLength - 1)) & ~(_sectorLength - 1)));
+       // var tempBuf = new byte[alignedCount];
+
+       // Read existing data(in case of partial sector write)
+       //     BaseStream.Read(tempBuf, 0, alignedCount);
+
+       //      Copy new data into the temp buffer at the correct offset
+       //     Buffer.BlockCopy(buffer, 0, tempBuf, (int)(_position % _sectorLength), count);
+
+       //      Seek back to the aligned offset for writing
+       //     BaseStream.Seek(offseta, SeekOrigin.Begin);
+
+       // Write the modified buffer back
+       //BaseStream.Write(tempBuf, 0, alignedCount);
+       // BaseStream.Flush();
+
+       //      Increment position by how much was written
+       //     _position += count;
+       // }
+
+       // public virtual void WriteBytes(byte[] buffer)
+       // {
+       //     int offset = ((int)this.BaseStream.Position);
+       //     Write(buffer, offset, buffer.Length);
+       // }
+
+       // public virtual void WriteByte(byte value)
+       // {
+       //     int offset = ((int)this.BaseStream.Position);
+       //     Write(new byte[] { value }, offset, 1);
+       // }
     }
 }

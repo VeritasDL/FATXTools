@@ -2,6 +2,7 @@
 using FATX.FileSystem;
 using FATXTools.Controls;
 using FATXTools.Database;
+using FATXTools.DiskTypes;
 using FATXTools.Utilities;
 using System;
 using System.Collections.Generic;
@@ -152,6 +153,15 @@ namespace FATXTools
         public void LoadFromJson(string path)
         {
             driveDatabase.LoadFromJson(path);
+        }
+
+        public void RecoverFromJson(string jsonPath, string recoveredFolder)
+        {
+            // Assume driveDatabase is a member field
+            if (this.driveDatabase != null)
+            {
+                this.driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
+            }
         }
 
         private void SelectedIndexChanged()

@@ -21,13 +21,20 @@ namespace FATXTools.Dialogs
             set;
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public bool DriveWrite
+        {
+            get;
+            set;
+        }
+
         public SettingsDialog()
         {
             InitializeComponent();
 
             this.FileCarverInterval = Properties.Settings.Default.FileCarverInterval;
             this.LogFile = Properties.Settings.Default.LogFile;
-
+            this.DriveWrite = Properties.Settings.Default.DriveWrite;
             switch (this.FileCarverInterval)
             {
                 case FileCarverInterval.Byte:
@@ -66,5 +73,17 @@ namespace FATXTools.Dialogs
         {
             LogFile = textBox1.Text;
         }
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+            {
+                DriveWrite = true;
+            }
+            else
+            {
+                DriveWrite = false;
+            }
+        }
+
     }
 }

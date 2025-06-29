@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Windows.Forms;
 
@@ -10,7 +11,7 @@ namespace FATXTools.Dialogs
 
     public partial class FileInfoDialog : Form
     {
-       public string CleanFileName(string input)
+        public string CleanFileName(string input)
         {
             // Reserved characters in Windows filenames
             char[] invalidChars = Path.GetInvalidFileNameChars();
@@ -43,7 +44,8 @@ namespace FATXTools.Dialogs
             String lastWriteTimeString = "";
             String lastAccessTimeString = "";
 
-            try {
+            try
+            {
                 creationTimeString = "invalid";
                 DateTime creationTime = new DateTime(dirent.CreationTime.Year,
                     dirent.CreationTime.Month, dirent.CreationTime.Day,
@@ -64,16 +66,21 @@ namespace FATXTools.Dialogs
                     dirent.LastAccessTime.Hour, dirent.LastAccessTime.Minute,
                     dirent.LastAccessTime.Second);
                 lastAccessTimeString = lastAccessTime.ToString();
-			}
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
 
+            long FirstClustOff = volume.ClusterToPhysicalOffset(dirent.FirstCluster);
             listView1.Items.Add("Creation Time").SubItems.Add(creationTimeString);
             listView1.Items.Add("Last Write Time").SubItems.Add(lastWriteTimeString);
             listView1.Items.Add("Last Access Time").SubItems.Add(lastAccessTimeString);
+            Console.WriteLine($"FirstCluster {dirent.FirstCluster}");
+            Console.WriteLine($"FirstClusterOffset: {FirstClustOff:X}");
+            Console.WriteLine($"dirent.Offset: {dirent.Offset:X}");
+
         }
 
         private string FormatAttributes(FileAttribute attributes)
@@ -102,6 +109,28 @@ namespace FATXTools.Dialogs
             }
 
             return attrStr;
+        }
+
+        private void listView1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                CopySelectedListViewItem();
+                e.Handled = true;
+            }
+        }
+        private void CopySelectedListViewItem()
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                var lines = listView1.SelectedItems
+                    .Cast<ListViewItem>()
+                    .Where(item => item.SubItems.Count > 1)
+                    .Select(item => item.SubItems[1].Text);
+
+                Clipboard.SetText(string.Join(Environment.NewLine, lines));
+                SystemSounds.Beep.Play();
+            }
         }
     }
 }
