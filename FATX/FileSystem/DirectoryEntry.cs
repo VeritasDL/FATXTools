@@ -6,23 +6,23 @@ namespace FATX.FileSystem
 {
     public class DirectoryEntry
     {
-        private byte _fileNameLength;
-        private byte _fileAttributes;
-        private byte[] _fileNameBytes;
-        private uint _firstCluster;
-        private uint _fileSize;
-        private uint _creationTimeAsInt;
-        private uint _lastWriteTimeAsInt;
-        private uint _lastAccessTimeAsInt;
-        private TimeStamp _creationTime;
-        private TimeStamp _lastWriteTime;
-        private TimeStamp _lastAccessTime;
-        private string _fileName;
+        public byte _fileNameLength;
+        public byte _fileAttributes;
+        public byte[] _fileNameBytes;
+        public uint _firstCluster;
+        public uint _fileSize;
+        public uint _creationTimeAsInt;
+        public uint _lastWriteTimeAsInt;
+        public uint _lastAccessTimeAsInt;
+        public TimeStamp _creationTime;
+        public TimeStamp _lastWriteTime;
+        public TimeStamp _lastAccessTime;
+        public string _fileName;
 
-        private DirectoryEntry _parent;
-        private List<DirectoryEntry> _children = new List<DirectoryEntry>();
-        private uint _cluster;
-        private long _offset;
+        public DirectoryEntry _parent;
+        public List<DirectoryEntry> _children = new List<DirectoryEntry>();
+        public uint _cluster;
+        public long _offset;
 
         public DirectoryEntry(Platform platform, byte[] data, int offset)
         {
@@ -67,6 +67,29 @@ namespace FATX.FileSystem
                 this._lastAccessTime = new X360TimeStamp(this._lastAccessTimeAsInt);
             }
         }
+        // Add this method inside your DirectoryEntry class
+        public void WriteTo(byte[] buffer, int offset)
+        {
+            if (buffer.Length - offset < 0x40) throw new ArgumentException("Buffer too small");
+            buffer[offset + 0x00] = this._fileNameLength;
+            buffer[offset + 0x01] = this._fileAttributes;
+            Array.Clear(buffer, offset + 0x02, 42);
+            if (this._fileNameBytes != null)
+                Array.Copy(this._fileNameBytes, 0, buffer, offset + 0x02, Math.Min(this._fileNameBytes.Length, 42));
+
+            void BE(uint val, int fieldOff)
+            {
+                var b = BitConverter.GetBytes(val);
+                if (BitConverter.IsLittleEndian) Array.Reverse(b);
+                Array.Copy(b, 0, buffer, offset + fieldOff, 4);
+            }
+            BE(this._firstCluster, 0x2C);
+            BE(this._fileSize, 0x30);
+            BE(this._creationTimeAsInt, 0x34);
+            BE(this._lastWriteTimeAsInt, 0x38);
+            BE(this._lastAccessTimeAsInt, 0x3C);
+        }
+
 
         public uint Cluster { get => _cluster; set => _cluster = value; }
 

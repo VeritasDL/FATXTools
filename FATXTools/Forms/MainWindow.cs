@@ -467,7 +467,7 @@ namespace FATXTools.Forms
                             {
                                 string jsonPath = openFileDialog.FileName;
                                 string recoveredFolder = folderBrowserDialog.SelectedPath;
-                                // Call recovery function on the drive view
+                                // Call recovery function on the drive view like loadFromJSONToolStripMenuItem_Click
                                 driveView.RecoverFromJson(jsonPath, recoveredFolder);
                             }
                         }

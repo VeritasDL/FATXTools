@@ -344,23 +344,41 @@ namespace FATXTools.Database
         }
         public void RecoverFromJson(JsonElement partitionElement, string recoveredFolder)
         {
-            // We are recovering a new database so clear previous results if needed
+            // Similar to LoadFromJson, but call FATXRecoveryRebuilder
+            fileDatabase.Reset();
 
-            // Find the Analysis element, which contains analysis results
-            JsonElement analysisElement;
-            if (!partitionElement.TryGetProperty("Analysis", out analysisElement))
+            if (!partitionElement.TryGetProperty("Analysis", out var analysisElement))
             {
                 var name = partitionElement.GetProperty("Name").GetString();
-                throw new FileLoadException($"Database: Partition ${name} is missing Analysis object");
+                throw new FileLoadException($"Database: Partition {name} is missing Analysis object");
             }
 
             if (analysisElement.TryGetProperty("MetadataAnalyzer", out var metadataAnalysisList))
             {
-                // Recovers the files from the json using the recovered folder
-                RecoverFromDatabase(metadataAnalysisList, recoveredFolder);
-            }
+                // --- Key difference: restore from JSON using Rebuilder ---
+                // You'll need access to the image stream and correct parameters
+                var imgStream = this.Volume.GetWriter().BaseStream;
+                long fileAreaOffset = 0x2865BC000;
+                uint clusterSize = this.Volume.BytesPerCluster;
+                var basePaths = new List<string> { recoveredFolder };
 
+                foreach (var entry in metadataAnalysisList.EnumerateArray())
+                {
+                    FATXTools.Recovery.FATXRecoveryRebuilder.RestoreTreeFromJson(
+                        entry,
+                        imgStream,
+                        basePaths,
+                        fileAreaOffset,
+                        clusterSize
+                    // Progress/reporting/callbacks can be added here if needed
+                    );
+                }
+                this.metadataAnalyzer = true;
+                OnLoadRecoveryFromDatabase?.Invoke(null, null);
+            }
+            // FileCarver code is omitted for brevity (not needed for restore)
         }
+
         private bool LoadFromDatabase(JsonElement metadataAnalysisObject)
         {
             if (metadataAnalysisObject.GetArrayLength() == 0)

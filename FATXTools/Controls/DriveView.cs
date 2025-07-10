@@ -157,12 +157,9 @@ namespace FATXTools
 
         public void RecoverFromJson(string jsonPath, string recoveredFolder)
         {
-            // Assume driveDatabase is a member field
-            if (this.driveDatabase != null)
-            {
-                this.driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
-            }
+            driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
         }
+
 
         private void SelectedIndexChanged()
         {
