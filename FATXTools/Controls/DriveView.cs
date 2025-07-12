@@ -155,10 +155,15 @@ namespace FATXTools
             driveDatabase.LoadFromJson(path);
         }
 
-        public void RecoverFromJson(string jsonPath, string recoveredFolder)
+        //public void RecoverFromJson(string jsonPath, string recoveredFolder)
+        //{
+        //    driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
+        //}
+        public void RecoverFromJson(string jsonPath, List<string> recoveredFolders)
         {
-            driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
+            driveDatabase.LoadRecoverFromJson(jsonPath, recoveredFolders);
         }
+
 
 
         private void SelectedIndexChanged()

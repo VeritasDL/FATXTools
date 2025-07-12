@@ -460,21 +460,38 @@ namespace FATXTools.Forms
 
                     if (dialogResult == DialogResult.Yes)
                     {
+                        var recoveredFolders = new List<string>();
+
+                        // Prompt for all relevant folders (can be repeated, or replaced with a better UX)
                         using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
                         {
-                            folderBrowserDialog.Description = "Select the folder containing recovered files.";
+                            folderBrowserDialog.Description = "Select the main 'Recovered Data' folder.";
                             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-                            {
-                                string jsonPath = openFileDialog.FileName;
-                                string recoveredFolder = folderBrowserDialog.SelectedPath;
-                                // Call recovery function on the drive view like loadFromJSONToolStripMenuItem_Click
-                                driveView.RecoverFromJson(jsonPath, recoveredFolder);
-                            }
+                                recoveredFolders.Add(folderBrowserDialog.SelectedPath);
                         }
+                        using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
+                        {
+                            folderBrowserDialog.Description = "Select the main 'Non Deleted Data' folder (or Cancel to skip).";
+                            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+                                recoveredFolders.Add(folderBrowserDialog.SelectedPath);
+                        }
+
+                        // Flatten all subfolders so every file is searched.
+                        var allRoots = new List<string>();
+                        foreach (var folder in recoveredFolders)
+                        {
+                            if (Directory.Exists(folder))
+                                allRoots.AddRange(Directory.GetDirectories(folder, "*", SearchOption.AllDirectories));
+                            allRoots.Add(folder);
+                        }
+
+                        // Call recovery function
+                        driveView.RecoverFromJson(openFileDialog.FileName, allRoots);
                     }
                 }
             }
         }
+
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {

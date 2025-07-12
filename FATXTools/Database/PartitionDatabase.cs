@@ -1,13 +1,13 @@
 ﻿using FATX;
 using FATX.Analyzers;
 using FATX.FileSystem;
+using FATXTools.Recovery;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-
 namespace FATXTools.Database
 {
     public class PartitionDatabase
@@ -232,18 +232,12 @@ namespace FATXTools.Database
             if (directoryEntryObject.TryGetProperty("Clusters", out var clustersElement))
             {
                 List<uint> clusterChain = new List<uint>();
-
-                //if (databaseFile.FileName == "ears_godfather")
-                //    System.Diagnostics.Debugger.Break();
-
                 foreach (var clusterIndex in clustersElement.EnumerateArray())
                 {
                     clusterChain.Add(clusterIndex.GetUInt32());
                 }
-
                 databaseFile.ClusterChain = clusterChain;
             }
-
             return databaseFile;
         }
         private void RestoreDirectoryEntryFromDatabase(JsonElement entry, string recoveredFolder, string relPath)
@@ -321,62 +315,59 @@ namespace FATXTools.Database
                 }
             }
         }
-        public void RecoverFromDatabase(JsonElement metadataAnalysisObject, string recoveredFolder)
+        /// <summary>
+        /// Restore partition from JSON, searching all provided folders for recovered data (single-use matching).
+        /// </summary>
+        /// <param name="partitionElement">Partition JSON element</param>
+        /// <param name="recoveredBasePaths">List of folders to search for recovered files</param>
+        /// <param name="progressCallback">Optional progress delegate</param>
+        /// <param name="logCallback">Optional log callback</param>
+        public void RecoverFromJson(
+            JsonElement partitionElement,
+            List<string> recoveredBasePaths,
+            FATXRecoveryRebuilder.ProgressDelegate progressCallback = null,
+            Action<string> logCallback = null)
         {
-            foreach (var directoryEntryObject in metadataAnalysisObject.EnumerateArray())
-            {
-                RestoreDirectoryEntryFromDatabase(directoryEntryObject, recoveredFolder, "");
-            }
-        }
-        public bool IsValidAttributes(FileAttribute attributes)
-        {
-            if (attributes == 0)
-            {
-                return true;
-            }
-
-            if (!Enum.IsDefined(typeof(FileAttribute), attributes))
-            {
-                return false;
-            }
-
-            return true;
-        }
-        public void RecoverFromJson(JsonElement partitionElement, string recoveredFolder)
-        {
-            // Similar to LoadFromJson, but call FATXRecoveryRebuilder
+            Console.WriteLine("PartitionDatabase.RecoverFromJson...");
             fileDatabase.Reset();
 
-            if (!partitionElement.TryGetProperty("Analysis", out var analysisElement))
+            // 1. Find the Analysis element
+            JsonElement analysisElement;
+            if (!partitionElement.TryGetProperty("Analysis", out analysisElement))
             {
                 var name = partitionElement.GetProperty("Name").GetString();
                 throw new FileLoadException($"Database: Partition {name} is missing Analysis object");
             }
 
-            if (analysisElement.TryGetProperty("MetadataAnalyzer", out var metadataAnalysisList))
+            // 2. Restore directory entries and file data from MetadataAnalyzer
+            if (analysisElement.TryGetProperty("MetadataAnalyzer", out var metadataAnalysisList) &&
+                metadataAnalysisList.ValueKind == JsonValueKind.Array)
             {
-                // --- Key difference: restore from JSON using Rebuilder ---
-                // You'll need access to the image stream and correct parameters
-                var imgStream = this.Volume.GetWriter().BaseStream;
-                long fileAreaOffset = 0x2865BC000;
-                uint clusterSize = this.Volume.BytesPerCluster;
-                var basePaths = new List<string> { recoveredFolder };
-
-                foreach (var entry in metadataAnalysisList.EnumerateArray())
-                {
-                    FATXTools.Recovery.FATXRecoveryRebuilder.RestoreTreeFromJson(
-                        entry,
-                        imgStream,
-                        basePaths,
-                        fileAreaOffset,
-                        clusterSize
-                    // Progress/reporting/callbacks can be added here if needed
-                    );
-                }
+                // Main call to the robust rebuilder
+                FATXRecoveryRebuilder.RestorePartitionFromJson(partitionElement,this.volume,this.fileDatabase,recoveredBasePaths,progressCallback,logCallback);
                 this.metadataAnalyzer = true;
-                OnLoadRecoveryFromDatabase?.Invoke(null, null);
+                OnLoadRecoveryFromDatabase?.Invoke(this, EventArgs.Empty);
             }
-            // FileCarver code is omitted for brevity (not needed for restore)
+            else
+            {
+                this.metadataAnalyzer = false;
+            }
+        }
+
+
+        /// <summary>
+        /// Restore all directory entries and files from the JSON analysis list.
+        /// </summary>
+        private bool LoadRecoveryFromDatabase(JsonElement metadataAnalysisObject, List<string> recoveredFolders)
+        {
+            if (metadataAnalysisObject.GetArrayLength() == 0)
+                return false;
+            // Load each root file and its children from the json database
+            foreach (var directoryEntryObject in metadataAnalysisObject.EnumerateArray())
+            {
+                FATXRecoveryRebuilder.DirectoryEntryFromJson(directoryEntryObject);
+            }
+            return true;
         }
 
         private bool LoadFromDatabase(JsonElement metadataAnalysisObject)
