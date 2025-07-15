@@ -21,14 +21,8 @@ namespace FATX
             get { return this.byteOrder; }
             set { this.byteOrder = value; }
         }
-        public virtual long Length
-        {
-            get { return BaseStream.Length; }
-        }
-        public virtual long Position
-        {
-            get { return BaseStream.Position; }
-        }
+        public virtual long Length => BaseStream.Length;
+        public virtual long Position => BaseStream.Position;
         public virtual long Seek(long offset)
         {
             BaseStream.Position = offset;
@@ -46,55 +40,29 @@ namespace FATX
         {
             var temp = BitConverter.GetBytes(value);
             if (byteOrder == ByteOrder.Big)
-            {
                 Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 2);
+            base.Write(temp);
         }
         public override void Write(ushort value)
         {
             var temp = BitConverter.GetBytes(value);
             if (byteOrder == ByteOrder.Big)
-            {
                 Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 2);
+            base.Write(temp);
         }
         public override void Write(int value)
         {
             var temp = BitConverter.GetBytes(value);
             if (byteOrder == ByteOrder.Big)
-            {
                 Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 4);
+            base.Write(temp);
         }
         public override void Write(uint value)
         {
             var temp = BitConverter.GetBytes(value);
             if (byteOrder == ByteOrder.Big)
-            {
                 Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 4);
-        }
-        public override void Write(long value)
-        {
-            var temp = BitConverter.GetBytes(value);
-            if (byteOrder == ByteOrder.Big)
-            {
-                Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 8);
-        }
-        public override void Write(ulong value)
-        {
-            var temp = BitConverter.GetBytes(value);
-            if (byteOrder == ByteOrder.Big)
-            {
-                Array.Reverse(temp);
-            }
-            base.Write(temp, 0, 8);
+            base.Write(temp);
         }
     }
 }

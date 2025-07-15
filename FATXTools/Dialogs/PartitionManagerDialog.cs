@@ -10,7 +10,7 @@ namespace FATXTools.Dialogs
     {
         private List<Volume> volumes;
         private DriveReader reader;
-
+        private DriveWriter writer;
         public PartitionManagerDialog()
         {
             InitializeComponent();
@@ -22,7 +22,7 @@ namespace FATXTools.Dialogs
 
             this.reader = reader;
             this.volumes = volumes;
-
+            this.writer = writer;
             PopulateList(volumes);
         }
 
@@ -32,7 +32,7 @@ namespace FATXTools.Dialogs
             var dialogResult = dialog.ShowDialog();
             if (dialogResult == DialogResult.OK)
             {
-                volumes.Add(new Volume(this.reader, dialog.PartitionName, dialog.PartitionOffset, dialog.PartitionLength));
+                volumes.Add(new Volume(this.reader, this.writer, dialog.PartitionName, dialog.PartitionOffset, dialog.PartitionLength));
 
                 PopulateList(volumes);
             }

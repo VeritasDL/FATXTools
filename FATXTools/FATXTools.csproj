@@ -39,6 +39,11 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Recovery\**" />
+    <EmbeddedResource Remove="Recovery\**" />
+    <None Remove="Recovery\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="file1.md" />
   </ItemGroup>
   <ItemGroup>

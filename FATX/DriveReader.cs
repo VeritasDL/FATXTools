@@ -13,15 +13,21 @@ namespace FATX
     {
 
         private List<Volume> _partitions = new List<Volume>();
-        public DriveReader(Stream stream)
+        private DriveWriter _writer;
+
+        public DriveReader(Stream stream, DriveWriter writer)
             : base(stream)
         {
+            _writer = writer;
         }
 
+        public DriveReader(Stream stream) : base(stream)
+        {
+        }
         public void Initialize()
         {
             Seek(0);
-
+            _writer = new DriveWriter(this.BaseStream);
             // Definitely need to refactor all of this..
             // Check for memory unit image
             if (ReadUInt64() == 0x534F44534D9058EB)
@@ -171,7 +177,7 @@ namespace FATX
 
         public void AddPartition(string name, long offset, long length, bool legacy = false)
         {
-            Volume partition = new Volume(this, name, offset, length, legacy);
+            Volume partition = new Volume(this,_writer, name, offset, length, legacy);
             _partitions.Add(partition);
         }
         public List<(string Name, long Offset, long Length)> GetDevkitHeaderPartitions()

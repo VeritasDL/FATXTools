@@ -34,6 +34,9 @@ namespace FATX
         {
             get { return BaseStream.Position; }
         }
+        /// <summary>
+        /// Seeks to the specified offset in the stream. and returns the new position.
+        /// </summary>
         public virtual long Seek(long offset)
         {
             BaseStream.Position = offset;

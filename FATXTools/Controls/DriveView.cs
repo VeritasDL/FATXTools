@@ -23,7 +23,7 @@ namespace FATXTools
         /// Currently loaded drive.
         /// </summary>
         private DriveReader drive;
-
+        private DriveWriter writer;
         private string driveName;
 
         /// <summary>
@@ -46,15 +46,13 @@ namespace FATXTools
             InitializeComponent();
         }
 
-        public void AddDrive(string name, DriveReader drive)
+        public void AddDrive(string name, DriveReader drive, DriveWriter writer)
         {
             this.driveName = name;
             this.drive = drive;
-
-            this.driveDatabase = new DriveDatabase(name, drive);
+            this.driveDatabase = new DriveDatabase(name, drive, writer);
             this.driveDatabase.OnPartitionAdded += DriveDatabase_OnPartitionAdded;
             this.driveDatabase.OnPartitionRemoved += DriveDatabase_OnPartitionRemoved;
-
             // Single task runner for this drive
             // Currently only one task will be allowed to operate on a drive to avoid race conditions.
             this.taskRunner = new TaskRunner(this.ParentForm);
@@ -139,7 +137,10 @@ namespace FATXTools
         {
             return drive;
         }
-
+        public DriveWriter GetDriveWriter()
+        {
+            return writer;
+        }
         public List<Volume> GetVolumes()
         {
             return partitionViews.Select(partitionView => partitionView.Volume).ToList();
@@ -150,21 +151,10 @@ namespace FATXTools
             driveDatabase.Save(path);
         }
 
-        public void LoadFromJson(string path)
+        public void LoadFromJson(string path, bool recoveryJson, List<string> allRoots = null)
         {
-            driveDatabase.LoadFromJson(path);
+            driveDatabase.LoadFromJson(path, recoveryJson, allRoots);
         }
-
-        //public void RecoverFromJson(string jsonPath, string recoveredFolder)
-        //{
-        //    driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
-        //}
-        public void RecoverFromJson(string jsonPath, List<string> recoveredFolders)
-        {
-            driveDatabase.LoadRecoverFromJson(jsonPath, recoveredFolders);
-        }
-
-
 
         private void SelectedIndexChanged()
         {

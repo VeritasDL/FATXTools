@@ -2,13 +2,22 @@
 
 namespace FATXTools.DiskTypes
 {
-    public class RawImage : FATX.DriveReader
+    public class RawImage
     {
-        // TODO: replace with FileStream to be able to use "using"
-        public RawImage(string fileName, bool write = true)
-            : base(new FileStream(fileName, FileMode.Open, write ? FileAccess.ReadWrite : FileAccess.Read))
+        private readonly FileStream _fileStream;
+        private readonly FATX.DriveReader _reader;
+        private readonly FATX.DriveWriter _writer;
+
+        public RawImage(string fileName)
         {
-            base.Initialize();
+            _fileStream = new FileStream(fileName, FileMode.Open, FileAccess.ReadWrite);
+            _reader = new FATX.DriveReader(_fileStream, _writer);
+            _reader.Initialize();
+            //_writer.Initialize();
         }
+
+        public FATX.DriveReader Reader => _reader;
+        public FATX.DriveWriter Writer => _writer;
+        public FileStream FileStream => _fileStream;
     }
 }

@@ -1,22 +1,23 @@
 ﻿using FATX;
 using FATX.FileSystem;
 using FATXTools.Controls;
+using FATXTools.Database;
 using FATXTools.Dialogs;
 using FATXTools.DiskTypes;
 using FATXTools.Utilities;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using FATXTools.Database;
 
 namespace FATXTools.Forms
 {
@@ -28,8 +29,12 @@ namespace FATXTools.Forms
         private const string HistoryFilePath = "FATxToolHistory.txt";
         private const string ApplicationTitle = "FATX-Recover";
         private TaskRunner Partition_taskRunner;
+        private TaskRunner taskRunner;
+        public event EventHandler TaskStarted;
+        public event EventHandler TaskCompleted;
         public event EventHandler Partition_TaskStarted;
         public event EventHandler Partition_TaskCompleted;
+        public bool recoveryJson;
         public MainWindow()
         {
             InitializeComponent();
@@ -209,7 +214,7 @@ namespace FATXTools.Forms
             string fileName = Path.GetFileName(path);
 
             RawImage rawImage = new RawImage(path);
-            driveView.AddDrive(fileName, rawImage); //called when loading a .img
+            driveView.AddDrive(fileName, rawImage.Reader, rawImage.Writer); //called when loading a .img
             AddToFileHistory(path);
             EnableDatabaseOptions();
         }
@@ -220,7 +225,7 @@ namespace FATXTools.Forms
 
             SafeFileHandle handle = WinApi.CreateFile(device,
                        FileAccess.ReadWrite,
-                       FileShare.None,
+                       FileShare.ReadWrite,
                        IntPtr.Zero,
                        FileMode.Open,
                        0,
@@ -228,7 +233,7 @@ namespace FATXTools.Forms
             long length = WinApi.GetDiskCapactity(handle);
             long sectorLength = WinApi.GetSectorSize(handle);
             PhysicalDisk drive = new PhysicalDisk(handle, length, sectorLength);
-            driveView.AddDrive(device, drive);
+            driveView.AddDrive(device, drive, driveView.GetDriveWriter());
             AddToFileHistory(device);
             EnableDatabaseOptions();
         }
@@ -324,7 +329,7 @@ namespace FATXTools.Forms
 
         private void devKitHeadderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (driveView != null && driveView.GetDrive() is DriveReader reader)
+            if (driveView != null && driveView.GetDrive() is DriveReader reader && driveView.GetDriveWriter() is DriveWriter writer)
             {
                 var partitions = reader.GetDevkitHeaderPartitions();
                 if (partitions.Count == 0)
@@ -339,7 +344,7 @@ namespace FATXTools.Forms
                 {
                     foreach (var (name, offset, length) in dialog.SelectedPartitions)
                     {
-                        driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
+                        driveView.AddPartition(new Volume(driveView.GetDrive(), driveView.GetDriveWriter(), name, offset, length));
                     }
 
                 }
@@ -379,12 +384,12 @@ namespace FATXTools.Forms
                         long offset = Convert.ToInt64(match.Groups["offset"].Value, 16);
                         long length = Convert.ToInt64(match.Groups["length"].Value, 16);
 
-                        driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
+                        driveView.AddPartition(new Volume(driveView.GetDrive(), driveView.GetDriveWriter(), name, offset, length));
                     }
                 }
                 else
                 {
-                    driveView.AddPartition(new Volume(driveView.GetDrive(),
+                    driveView.AddPartition(new Volume(driveView.GetDrive(), driveView.GetDriveWriter(),
                         partitionDialog.PartitionName,
                         partitionDialog.PartitionOffset,
                         partitionDialog.PartitionLength));
@@ -418,32 +423,118 @@ namespace FATXTools.Forms
                 Console.WriteLine($"Finished saving database: {saveFileDialog.FileName}");
             }
         }
+        //private void loadFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    OpenFileDialog openFileDialog = new OpenFileDialog()
+        //    {
+        //        Filter = "JSON File (*.json)|*.json"
+        //    };
 
+        //    if (openFileDialog.ShowDialog() == DialogResult.OK)
+        //    {
+        //        var dialogResult = MessageBox.Show($"Loading a database will overwrite current analysis progress.\n"
+        //            + $"Are you sure you want to load \'{Path.GetFileName(openFileDialog.FileName)}\'?",
+        //            "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+        //        if (dialogResult == DialogResult.Yes)
+        //        {
+        //            bool recoveryJson = false;
+        //            List<string> allRoots = null;
+
+        //            var recoveryDialogResult = MessageBox.Show($"Do you want to attempt to recreate the HDD from this JSON file?\n"
+        //                + "This will overwrite the current image with the data from the JSON file.\n"
+        //                + "You will need to have previously recovered files available to write into the image.",
+        //                "Recover from JSON", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+        //            if (recoveryDialogResult == DialogResult.Yes)
+        //            {
+        //                recoveryJson = true;
+        //                allRoots = new List<string>();
+
+        //                // Prompt for 'Recovered Data' folder
+        //                using (FolderBrowserDialog recoveredDialog = new FolderBrowserDialog())
+        //                {
+        //                    recoveredDialog.Description = "Select the main 'Recovered Data' folder.";
+        //                    if (recoveredDialog.ShowDialog() == DialogResult.OK)
+        //                    {
+        //                        allRoots.AddRange(Directory.GetFiles(recoveredDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+        //                    }
+        //                }
+
+        //                // Prompt for 'Non Deleted Data' folder
+        //                using (FolderBrowserDialog nonDeletedDialog = new FolderBrowserDialog())
+        //                {
+        //                    nonDeletedDialog.Description = "Select the main 'Non Deleted Data' folder (or Cancel to skip).";
+        //                    if (nonDeletedDialog.ShowDialog() == DialogResult.OK)
+        //                    {
+        //                        allRoots.AddRange(Directory.GetFiles(nonDeletedDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+        //                    }
+        //                }
+        //            }
+
+        //            // Call the updated LoadFromJson, passing recoveryJson and allRoots
+        //            driveView.LoadFromJson(openFileDialog.FileName, recoveryJson, allRoots);
+        //            Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+        //        }
+        //    }
+        //}
         private void loadFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()
             {
                 Filter = "JSON File (*.json)|*.json"
             };
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
-            {
-                Description = "Select a folder to search for recovered files (recursive search)"
-            };
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 var dialogResult = MessageBox.Show($"Loading a database will overwrite current analysis progress.\n"
                     + $"Are you sure you want to load \'{Path.GetFileName(openFileDialog.FileName)}\'?",
                     "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
                 if (dialogResult == DialogResult.Yes)
                 {
-                    //prompt user if they want to write or not 
-                    driveView.LoadFromJson(openFileDialog.FileName);
+                    bool recoveryJson = false;
+                    List<string> allRoots = null;
 
-                    Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+                    var recoveryDialogResult = MessageBox.Show($"Do you want to attempt to recreate the HDD from this JSON file?\n"
+                        + "This will overwrite the current image with the data from the JSON file.\n"
+                        + "You will need to have previously recovered files available to write into the image.",
+                        "Recover from JSON", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                    if (recoveryDialogResult == DialogResult.Yes)
+                    {
+                        recoveryJson = true;
+                        allRoots = new List<string>();
+
+                        // Prompt for 'Recovered Data' folder
+                        using (FolderBrowserDialog recoveredDialog = new FolderBrowserDialog())
+                        {
+                            recoveredDialog.Description = "Select the main 'Recovered Data' folder.";
+                            if (recoveredDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                allRoots.AddRange(Directory.GetFiles(recoveredDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+                            }
+                        }
+
+                        // Prompt for 'Non Deleted Data' folder
+                        using (FolderBrowserDialog nonDeletedDialog = new FolderBrowserDialog())
+                        {
+                            nonDeletedDialog.Description = "Select the main 'Non Deleted Data' folder (or Cancel to skip).";
+                            if (nonDeletedDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                allRoots.AddRange(Directory.GetFiles(nonDeletedDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+                            }
+                        }
+                    }
+
+                    var jsonPath = openFileDialog.FileName;
+                    // Synchronous load, no task runner
+                    driveView.LoadFromJson(jsonPath, recoveryJson, allRoots);
+
+                    Console.WriteLine($"Finished loading database: {jsonPath}");
                 }
             }
         }
-
         private void RecoverFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -486,7 +577,7 @@ namespace FATXTools.Forms
                         }
 
                         // Call recovery function
-                        driveView.RecoverFromJson(openFileDialog.FileName, allRoots);
+                        //driveView.RecoverFromJson(openFileDialog.FileName, allRoots);
                     }
                 }
             }

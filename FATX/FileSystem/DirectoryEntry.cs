@@ -18,7 +18,7 @@ namespace FATX.FileSystem
         public TimeStamp _lastWriteTime;
         public TimeStamp _lastAccessTime;
         public string _fileName;
-
+        public uint _bytesPerCluster = Constants.FourKCluster; // Default to 4K cluster size, can be changed if needed
         public DirectoryEntry _parent;
         public List<DirectoryEntry> _children = new List<DirectoryEntry>();
         public uint _cluster;
@@ -38,19 +38,7 @@ namespace FATX.FileSystem
 
             this._fileNameBytes = new byte[42];
             Buffer.BlockCopy(data, offset + 2, this._fileNameBytes, 0, 42);
-
-            if (platform == Platform.Xbox)
-            {
-                this._firstCluster = BitConverter.ToUInt32(data, offset + 0x2C);
-                this._fileSize = BitConverter.ToUInt32(data, offset + 0x30);
-                this._creationTimeAsInt = BitConverter.ToUInt32(data, offset + 0x34);
-                this._lastWriteTimeAsInt = BitConverter.ToUInt32(data, offset + 0x38);
-                this._lastAccessTimeAsInt = BitConverter.ToUInt32(data, offset + 0x3C);
-                this._creationTime = new XTimeStamp(this._creationTimeAsInt);
-                this._lastWriteTime = new XTimeStamp(this._lastWriteTimeAsInt);
-                this._lastAccessTime = new XTimeStamp(this._lastAccessTimeAsInt);
-            }
-            else if (platform == Platform.X360)
+            if (platform == Platform.X360)
             {
                 Array.Reverse(data, offset + 0x2C, 4);
                 this._firstCluster = BitConverter.ToUInt32(data, offset + 0x2C);

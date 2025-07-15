@@ -9,10 +9,10 @@ namespace FATX.FileSystem
     public class Volume
     {
         private readonly DriveReader _reader;
+        private readonly DriveWriter _writer;
         private readonly string _partitionName;
         private readonly long _partitionOffset;
         private long _partitionLength;
-        private EndianWriter _writer;
         public const uint VolumeSignature = 0x58544146;
 
         private uint _signature;
@@ -41,7 +41,6 @@ namespace FATX.FileSystem
         private uint[] _fileAllocationTable;
         private long _fileAreaLength;
         private Platform _platform;
-
         /// <summary>
         /// Creates a new FATX volume.
         /// </summary>
@@ -53,14 +52,14 @@ namespace FATX.FileSystem
         /// Set this to true if this is the legacy FATX file system. 
         /// It appears to only be used in older DVT3 xbox systems with kernel 3633 or earlier.
         /// </param>
-        public Volume(DriveReader reader, string name, long offset, long length, bool legacy = false)
+        public Volume(DriveReader reader, DriveWriter writer, string name, long offset, long length, bool legacy = false)
         {
             this._reader = reader;
+            this._writer = writer;
             this._partitionName = name;
             this._partitionLength = length;
             this._partitionOffset = offset;
             this._usesLegacyFormat = legacy;
-            this._writer = new EndianWriter(reader.BaseStream, ByteOrder.Big);
             this._platform = (reader.ByteOrder == ByteOrder.Big) ?
                 Platform.X360 : Platform.Xbox;
 
@@ -100,7 +99,7 @@ namespace FATX.FileSystem
         public DriveReader GetReader()
         { return _reader; }
 
-        public EndianWriter GetWriter()
+        public DriveWriter GetWriter()
         { return _writer; }
 
         public uint[] FileAllocationTable
