@@ -10,23 +10,19 @@ namespace FATX.FileSystem
     {
         private readonly DriveReader _reader;
         private readonly string _partitionName;
-        private readonly long _partitionOffset;
+        private long _partitionOffset;
         private long _partitionLength;
-        private EndianWriter _writer;
         public const uint VolumeSignature = 0x58544146;
-
         private uint _signature;
         private uint _serialNumber;
         private uint _sectorsPerCluster;
         private uint _rootDirFirstCluster;
-
         private uint _bytesPerCluster;
         private uint _maxClusters;
         private uint _bytesPerFat;
         private bool _isFat16;
         private uint _fatByteOffset;
         private uint _fileAreaByteOffset;
-
         private bool _usesLegacyFormat;
         private uint _jump;
         private ushort _bytesPerSector;
@@ -36,7 +32,6 @@ namespace FATX.FileSystem
         private uint _hiddenSectors;
         private uint _largeSectors;
         private uint _largeSectorsPerFat;
-
         private List<DirectoryEntry> _root = new List<DirectoryEntry>();
         private uint[] _fileAllocationTable;
         private long _fileAreaLength;
@@ -60,7 +55,7 @@ namespace FATX.FileSystem
             this._partitionLength = length;
             this._partitionOffset = offset;
             this._usesLegacyFormat = legacy;
-            this._writer = new EndianWriter(reader.BaseStream, ByteOrder.Big);
+
             this._platform = (reader.ByteOrder == ByteOrder.Big) ?
                 Platform.X360 : Platform.Xbox;
 
@@ -99,9 +94,6 @@ namespace FATX.FileSystem
 
         public DriveReader GetReader()
         { return _reader; }
-
-        public EndianWriter GetWriter()
-        { return _writer; }
 
         public uint[] FileAllocationTable
         {
@@ -179,9 +171,6 @@ namespace FATX.FileSystem
                 Console.WriteLine($"Invalid FATX Signature for {_partitionName}: {_signature:X8}");
             }
         }
-        //		_partitionLength	0x0000003663c7e000	long
-        //		_partitionLength	0x0000000010000000	long
-
         private void ReadLegacyVolumeMetadata()
         {
             // Read _BOOT_SECTOR
@@ -213,11 +202,14 @@ namespace FATX.FileSystem
         /// </summary>
         private void CalculateOffsets()
         {
-            if (_sectorsPerCluster == 0x00000000)
+            if (_sectorsPerCluster == 0x00000000 || _partitionOffset == 0x0 || _partitionLength == 0x0)
             {
                 this._sectorsPerCluster = 0x20;
                 this._bytesPerCluster = 0x4000;
                 this._partitionLength = 0xF1A8F2000;
+                this._partitionOffset = 0x2856A0000;
+                _bytesPerCluster = _sectorsPerCluster * Constants.SectorSize;
+                _maxClusters = (uint)(_partitionLength / (long)_bytesPerCluster) + Constants.ReservedClusters;
             }
             else
             {
@@ -407,7 +399,7 @@ namespace FATX.FileSystem
             foreach (DirectoryEntry dirent in stream)
             {
                 dirent.Cluster = clusterIndex;
-                Console.WriteLine(String.Format("{0}", dirent.FileName));
+                //Console.WriteLine(String.Format("{0}", dirent.FileName));
 
                 if (dirent.IsDirectory() && !dirent.IsDeleted())
                 {

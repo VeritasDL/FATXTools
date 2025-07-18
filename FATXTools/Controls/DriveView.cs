@@ -149,19 +149,9 @@ namespace FATXTools
         {
             driveDatabase.Save(path);
         }
-
-        public void LoadFromJson(string path)
+        public void LoadFromJson(string path, bool recoveryJson, List<string> allRoots = null)
         {
-            driveDatabase.LoadFromJson(path);
-        }
-
-        public void RecoverFromJson(string jsonPath, string recoveredFolder)
-        {
-            // Assume driveDatabase is a member field
-            if (this.driveDatabase != null)
-            {
-                this.driveDatabase.RecoverFromJson(jsonPath, recoveredFolder);
-            }
+            driveDatabase.LoadFromJson(path, recoveryJson, allRoots);
         }
 
         private void SelectedIndexChanged()

@@ -8,29 +8,9 @@ namespace FATXTools.Utilities
     public static class WinApi
     {
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern SafeFileHandle CreateFile(
-            string FileName,
-            FileAccess DesiredAccess,
-            FileShare ShareMode,
-            IntPtr SecurityAttributes,
-            FileMode CreationDisposition,
-            int FlagsAndAttributes,
-            IntPtr Template);
-
+        public static extern SafeFileHandle CreateFile( string FileName, FileAccess DesiredAccess, FileShare ShareMode, IntPtr SecurityAttributes, FileMode CreationDisposition, int FlagsAndAttributes, IntPtr Template);
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool DeviceIoControl(
-            SafeFileHandle hDevice,
-            uint dwIoControlCode,
-            [MarshalAs(UnmanagedType.AsAny)]
-            [Out] object lpInBuffer,
-            int nInBufferSize,
-            [MarshalAs(UnmanagedType.AsAny)]
-            [Out] object lpOutBuffer,
-            int nOutBufferSize,
-            ref int pBytesReturned,
-            IntPtr lpOverlapped
-            );
-
+        public static extern bool DeviceIoControl(SafeFileHandle hDevice, uint dwIoControlCode, [MarshalAs(UnmanagedType.AsAny)] [Out] object lpInBuffer, int nInBufferSize, [MarshalAs(UnmanagedType.AsAny)] [Out] object lpOutBuffer, int nOutBufferSize, ref int pBytesReturned, IntPtr lpOverlapped);
         public static long GetDiskCapactity(SafeFileHandle diskHandle)
         {
             byte[] sizeBytes = new byte[8];
@@ -41,7 +21,6 @@ namespace FATXTools.Utilities
             }
             return BitConverter.ToInt64(sizeBytes, 0);
         }
-
         public static long GetSectorSize(SafeFileHandle diskHandle)
         {
             byte[] buf = new byte[0x18];

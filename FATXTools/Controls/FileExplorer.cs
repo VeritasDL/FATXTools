@@ -478,23 +478,7 @@ namespace FATXTools.Controls
                     "Error", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
             }
 
-            private void WriteFile(string path, DirectoryEntry dirent, List<uint> chainMap)
-            {
-                using (FileStream outFile = File.OpenWrite(path))
-                {
-                    uint bytesLeft = dirent.FileSize;
 
-                    foreach (uint cluster in chainMap)
-                    {
-                        byte[] clusterData = this.volume.ReadCluster(cluster);
-
-                        var writeSize = Math.Min(bytesLeft, this.volume.BytesPerCluster);
-                        outFile.Write(clusterData, 0, (int)writeSize);
-
-                        bytesLeft -= writeSize;
-                    }
-                }
-            }
             private void FileSetTimeStamps(string path, DirectoryEntry dirent)
             {
                 File.SetCreationTime(path, dirent.CreationTime.AsDateTime());

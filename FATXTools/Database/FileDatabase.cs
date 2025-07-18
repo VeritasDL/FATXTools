@@ -68,10 +68,6 @@ namespace FATXTools.Database
             {
                 if (chainMap.Contains(child.Value.Cluster))
                 {
-                    //if (child.Value.HasParent())
-                    //{
-                    //    Console.WriteLine("Warning: {0} already has a parent", child.Value.FileName);
-                    //}
                     // TODO: Use a HashSet or something..
                     // Add the file as a child of the parent.
                     if (!parent.Children.Contains(child.Value))

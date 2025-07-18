@@ -17,7 +17,6 @@ using System.Xml.Linq;
 using System.Diagnostics;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using FATXTools.Database;
-
 namespace FATXTools.Forms
 {
     public partial class MainWindow : Form
@@ -30,14 +29,13 @@ namespace FATXTools.Forms
         private TaskRunner Partition_taskRunner;
         public event EventHandler Partition_TaskStarted;
         public event EventHandler Partition_TaskCompleted;
+        public bool VeritasDL_DebugMode = true; // Debug mode toggle for my testing, toggle here
         public MainWindow()
         {
             InitializeComponent();
-
             this.Text = ApplicationTitle;
             this.Name = "MainWindow";
             DisableDatabaseOptions();
-
             Console.SetOut(new LogWriter(this.textBox1));
             Console.WriteLine("--------------------------------");
             Console.WriteLine("FATX-Tools v0.3");
@@ -53,7 +51,6 @@ namespace FATXTools.Forms
                 UpdateFileHistoryMenu();
             }
         }
-
         public class LogWriter : TextWriter
         {
             private TextBox textBox;
@@ -62,22 +59,18 @@ namespace FATXTools.Forms
             {
                 this.textBox = textBox;
             }
-
             public override void Write(char value)
             {
                 textBox.Text += value;
             }
-
             public override void Write(string value)
             {
                 textBox.AppendText(value);
             }
-
             public override void WriteLine()
             {
                 textBox.AppendText(NewLine);
             }
-
             public override void WriteLine(string value)
             {
                 if (textBox.InvokeRequired)
@@ -90,55 +83,43 @@ namespace FATXTools.Forms
                     textBox.AppendText(value + NewLine);
                 }
             }
-
             public override Encoding Encoding
             {
                 get { return Encoding.ASCII; }
             }
         }
-
         private void CreateNewDriveView(string path)
         {
             this.Text = $"{ApplicationTitle} - {Path.GetFileName(path)}";
-
             // Destroy the current drive view
             splitContainer1.Panel1.Controls.Remove(driveView);
-
             // Create a new view for this drive
             driveView = new DriveView();
             driveView.Dock = DockStyle.Fill;
             driveView.TabSelectionChanged += DriveView_TabSelectionChanged;
             driveView.TaskStarted += DriveView_TaskStarted;
             driveView.TaskCompleted += DriveView_TaskCompleted;
-
             // Add the view to the panel
             splitContainer1.Panel1.Controls.Add(driveView);
         }
-
         private void DriveView_TaskCompleted(object sender, EventArgs e)
         {
             EnableOpenOptions();
             EnableDatabaseOptions();
         }
-
         private void DriveView_TaskStarted(object sender, EventArgs e)
         {
             DisableOpenOptions();
             DisableDatabaseOptions();
         }
-
         private void PartitionGui_TaskCompleted(object sender, EventArgs e)
         {
             // Single task runner for this drive
             // Currently only one task will be allowed to operate on a drive to avoid race conditions.
-
         }
-
         private void MainGui_TaskStarted(object sender, EventArgs e)
         {
-
         }
-
         private void DriveView_TabSelectionChanged(object sender, PartitionSelectedEventArgs e)
         {
             if (e == null)
@@ -148,7 +129,6 @@ namespace FATXTools.Forms
             else
             {
                 var volume = e.volume;
-
                 statusStrip1.Items.Clear();
                 if (volume.Mounted)
                 {
@@ -168,63 +148,45 @@ namespace FATXTools.Forms
                 }
             }
         }
-
         private void EnableDatabaseOptions()
         {
             loadToolStripMenuItem.Enabled = true;
             saveToolStripMenuItem.Enabled = true;
-
             addPartitionToolStripMenuItem.Enabled = true;
             //searchForPartitionsToolStripMenuItem.Enabled = true;
             //managePartitionsToolStripMenuItem.Enabled = true;
         }
-
         private void DisableDatabaseOptions()
         {
             loadToolStripMenuItem.Enabled = false;
             saveToolStripMenuItem.Enabled = false;
-
             addPartitionToolStripMenuItem.Enabled = false;
             //searchForPartitionsToolStripMenuItem.Enabled = false;
             //managePartitionsToolStripMenuItem.Enabled = false;
         }
-
         private void EnableOpenOptions()
         {
             openImageToolStripMenuItem.Enabled = true;
             openDeviceToolStripMenuItem.Enabled = true;
-
         }
-
         private void DisableOpenOptions()
         {
             openImageToolStripMenuItem.Enabled = false;
             openDeviceToolStripMenuItem.Enabled = false;
         }
-
         private void OpenDiskImage(string path)
         {
             CreateNewDriveView(path);
-
             string fileName = Path.GetFileName(path);
-
             RawImage rawImage = new RawImage(path);
             driveView.AddDrive(fileName, rawImage); //called when loading a .img
             AddToFileHistory(path);
             EnableDatabaseOptions();
         }
-
         private void OpenDisk(string device)
         {
             CreateNewDriveView(device);
-
-            SafeFileHandle handle = WinApi.CreateFile(device,
-                       FileAccess.ReadWrite,
-                       FileShare.None,
-                       IntPtr.Zero,
-                       FileMode.Open,
-                       0,
-                       IntPtr.Zero);
+            SafeFileHandle handle = WinApi.CreateFile(device, FileAccess.ReadWrite, FileShare.ReadWrite, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
             long length = WinApi.GetDiskCapactity(handle);
             long sectorLength = WinApi.GetSectorSize(handle);
             PhysicalDisk drive = new PhysicalDisk(handle, length, sectorLength);
@@ -232,22 +194,18 @@ namespace FATXTools.Forms
             AddToFileHistory(device);
             EnableDatabaseOptions();
         }
-
         private void openImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 OpenDiskImage(ofd.FileName);
-
             }
         }
-
         private void openDeviceToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var isAdmin = new WindowsPrincipal(WindowsIdentity.GetCurrent())
                 .IsInRole(WindowsBuiltInRole.Administrator);
-
             if (!isAdmin)
             {
                 MessageBox.Show("You must re-run this program with Administrator privileges\n" +
@@ -255,14 +213,12 @@ namespace FATXTools.Forms
                                 "Cannot perform operation", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-
             DeviceSelectionDialog ds = new DeviceSelectionDialog();
             if (ds.ShowDialog() == DialogResult.OK)
             {
                 OpenDisk(ds.SelectedDevice);
             }
         }
-
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(
@@ -271,7 +227,6 @@ namespace FATXTools.Forms
                 "Please report any bugs\n",
                 "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
         private void MainWindow_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -293,7 +248,6 @@ namespace FATXTools.Forms
                 e.Effect = DragDropEffects.None;
             }
         }
-
         private void MainWindow_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -307,12 +261,10 @@ namespace FATXTools.Forms
                 OpenDiskImage(path);
             }
         }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
-
         private void managePartitionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (driveView != null)
@@ -321,7 +273,6 @@ namespace FATXTools.Forms
                 //partitionManagerForm.ShowDialog();
             }
         }
-
         private void devKitHeadderToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (driveView != null && driveView.GetDrive() is DriveReader reader)
@@ -332,7 +283,6 @@ namespace FATXTools.Forms
                     MessageBox.Show("No Devkit header partitions found.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-
                 var dialog = new FoundPartitionDialog(partitions);
                 var result = dialog.ShowDialog();
                 if (result == DialogResult.OK)
@@ -341,44 +291,27 @@ namespace FATXTools.Forms
                     {
                         driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
                     }
-
                 }
             }
         }
-
-        private void retail1888ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void retail2125618ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
         public void addPartitionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NewPartitionDialog partitionDialog = new NewPartitionDialog();
             var dialogResult = partitionDialog.ShowDialog();
-
             if (dialogResult == DialogResult.OK)
             {
                 string arrayInput = partitionDialog.textBox4.Text;
-
                 if (!string.IsNullOrWhiteSpace(arrayInput))
                 {
                     var lines = arrayInput.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
                     foreach (string line in lines)
                     {
                         var match = Regex.Match(line, @"\(\s*""(?<name>[^""]+)""\s*,\s*0x(?<offset>[0-9A-Fa-f]+)\s*,\s*0x(?<length>[0-9A-Fa-f]+)\s*\)");
                         if (!match.Success)
                             continue;
-
                         string name = match.Groups["name"].Value;
                         long offset = Convert.ToInt64(match.Groups["offset"].Value, 16);
                         long length = Convert.ToInt64(match.Groups["length"].Value, 16);
-
                         driveView.AddPartition(new Volume(driveView.GetDrive(), name, offset, length));
                     }
                 }
@@ -391,7 +324,6 @@ namespace FATXTools.Forms
                 }
             }
         }
-
         private void settingsToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             SettingsDialog settings = new SettingsDialog();
@@ -399,65 +331,115 @@ namespace FATXTools.Forms
             {
                 Properties.Settings.Default.FileCarverInterval = settings.FileCarverInterval;
                 Properties.Settings.Default.LogFile = settings.LogFile;
-
                 Properties.Settings.Default.Save();
             }
         }
-
         private void saveToJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
                 Filter = "JSON File (*.json)|*.json"
             };
-
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 driveView.Save(saveFileDialog.FileName);
-
                 Console.WriteLine($"Finished saving database: {saveFileDialog.FileName}");
             }
         }
-
+        //private void loadFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    OpenFileDialog openFileDialog = new OpenFileDialog()
+        //    {
+        //        Filter = "JSON File (*.json)|*.json"
+        //    };
+        //    FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
+        //    {
+        //        Description = "Select a folder to search for recovered files (recursive search)"
+        //    };
+        //    if (openFileDialog.ShowDialog() == DialogResult.OK)
+        //    {
+        //        var dialogResult = MessageBox.Show($"Loading a database will overwrite current analysis progress.\n"
+        //            + $"Are you sure you want to load \'{Path.GetFileName(openFileDialog.FileName)}\'?",
+        //            "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        //        if (dialogResult == DialogResult.Yes)
+        //        {
+        //            //prompt user if they want to write or not 
+        //            driveView.LoadFromJson(openFileDialog.FileName);
+        //            Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+        //        }
+        //    }
+        //}
         private void loadFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()
             {
                 Filter = "JSON File (*.json)|*.json"
             };
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog()
-            {
-                Description = "Select a folder to search for recovered files (recursive search)"
-            };
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 var dialogResult = MessageBox.Show($"Loading a database will overwrite current analysis progress.\n"
                     + $"Are you sure you want to load \'{Path.GetFileName(openFileDialog.FileName)}\'?",
-                    "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    "Load File", MessageBoxButtons.YesNo, MessageBoxIcon.None);
+
                 if (dialogResult == DialogResult.Yes)
                 {
-                    //prompt user if they want to write or not 
-                    driveView.LoadFromJson(openFileDialog.FileName);
+                    bool recoveryJson = false;
+                    List<string> allRoots = null;
+                    var recoveryDialogResult = MessageBox.Show($"Do you want to attempt to recreate the HDD from this JSON file?\n"
+                        + "This will overwrite the current image with the data from the JSON file.\n"
+                        + "You will need to have previously recovered files available to write into the image.",
+                        "Recover from JSON", MessageBoxButtons.YesNo, MessageBoxIcon.None);
 
-                    Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+                    if (recoveryDialogResult == DialogResult.Yes)
+                    {
+                        recoveryJson = true;
+                        allRoots = new List<string>();
+                        // Prompt for 'Recovered Data' folder
+                        using (FolderBrowserDialog recoveredDialog = new FolderBrowserDialog())
+                        {
+                            recoveredDialog.Description = "Select the main 'Recovered Data' folder.";
+                            if (recoveredDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                allRoots.AddRange(Directory.GetFiles(recoveredDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+                            }
+                        }
+                        // Prompt for 'Non Deleted Data' folder
+                        using (FolderBrowserDialog nonDeletedDialog = new FolderBrowserDialog())
+                        {
+                            nonDeletedDialog.Description = "Select the main 'Non Deleted Data' folder (or Cancel to skip).";
+                            if (nonDeletedDialog.ShowDialog() == DialogResult.OK)
+                            {
+                                allRoots.AddRange(Directory.GetFiles(nonDeletedDialog.SelectedPath, "*.*", SearchOption.AllDirectories));
+                            }
+                        }
+                        var jsonPath = openFileDialog.FileName;
+                        // Synchronous load, no task runner
+                        driveView.LoadFromJson(jsonPath, recoveryJson, allRoots);
+                        Console.WriteLine($"Finished loading database: {jsonPath}");
+                    }
+                    else
+                    {
+                        // Normal load, no recovery
+                        recoveryJson = false;
+                        driveView.LoadFromJson(openFileDialog.FileName, recoveryJson);
+                        Console.WriteLine($"Finished loading database: {openFileDialog.FileName}");
+                    }
                 }
             }
         }
-
         private void RecoverFromJSONToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "JSON Files (*.json)|*.json|All Files (*.*)|*.*";
                 openFileDialog.Title = "Select Recovery JSON";
-
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     var dialogResult = MessageBox.Show(
                         $"Recovering from a JSON will directly overwrite/write to the image.\n"
                         + $"Are you sure you want to use '{Path.GetFileName(openFileDialog.FileName)}' to attempt recovery?",
                         "Confirm Recovery", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-
                     if (dialogResult == DialogResult.Yes)
                     {
                         using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
@@ -468,14 +450,13 @@ namespace FATXTools.Forms
                                 string jsonPath = openFileDialog.FileName;
                                 string recoveredFolder = folderBrowserDialog.SelectedPath;
                                 // Call recovery function on the drive view
-                                driveView.RecoverFromJson(jsonPath, recoveredFolder);
+                                //driveView.RecoverFromJson(jsonPath, recoveredFolder);
                             }
                         }
                     }
                 }
             }
         }
-
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             // TODO: For any partition, if any analysis was made, then we should ask.
@@ -489,11 +470,9 @@ namespace FATXTools.Forms
                     {
                         Filter = "JSON File (*.json)|*.json"
                     };
-
                     if (saveFileDialog.ShowDialog() == DialogResult.OK)
                     {
                         driveView.Save(saveFileDialog.FileName);
-
                         Console.WriteLine($"Finished saving database: {saveFileDialog.FileName}");
                     }
                     else
@@ -507,7 +486,6 @@ namespace FATXTools.Forms
                     return;
                 }
             }
-
             // TODO: handle closing dialogs
             e.Cancel = false;
         }
@@ -523,35 +501,27 @@ namespace FATXTools.Forms
         {
             if (fileHistory.Contains(device))
                 fileHistory.Remove(device);
-
             fileHistory.Insert(0, device);
-
             if (fileHistory.Count > MaxHistoryCount)
                 fileHistory.RemoveAt(fileHistory.Count - 1);
-
             SaveFileHistory();
             UpdateFileHistoryMenu();
         }
-
         private void LoadFileHistory()
         {
             if (File.Exists(HistoryFilePath))
                 fileHistory = File.ReadAllLines(HistoryFilePath).ToList();
             else
                 File.Create(HistoryFilePath).Dispose();
-
             UpdateFileHistoryMenu();
         }
-
         private void SaveFileHistory()
         {
             File.WriteAllLines(HistoryFilePath, fileHistory);
         }
-
         private void UpdateFileHistoryMenu()
         {
             historyToolStripMenuItem.DropDownItems.Clear();
-
             if (fileHistory.Count == 0)
             {
                 var emptyItem = new ToolStripMenuItem("No history found");
@@ -559,7 +529,6 @@ namespace FATXTools.Forms
                 historyToolStripMenuItem.DropDownItems.Add(emptyItem);
                 return;
             }
-
             foreach (var file in fileHistory)
             {
                 var item = new ToolStripMenuItem(file);

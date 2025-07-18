@@ -332,7 +332,7 @@ namespace FATX.Analyzers
         /// </summary>
         /// <param name="dirent"></param>
         /// <returns></returns>
-        private bool IsValidDirent(DirectoryEntry dirent)
+        public bool IsValidDirent(DirectoryEntry dirent)
         {
             if (!IsValidFileNameLength(dirent.FileNameLength))
             {

@@ -8,7 +8,7 @@ namespace FATX.FileSystem
         public const uint PageSize = 0x1000;
         public const uint ReservedBytes = PageSize;
         public const uint ReservedClusters = 1;
-
+        public const uint DevKitClusterSize = 0x4000;
         public const uint DirentNeverUsed = 0x00;
         public const uint DirentNeverUsed2 = 0xFF;
         public const uint DirentDeleted = 0xE5;
